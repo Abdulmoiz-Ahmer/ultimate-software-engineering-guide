@@ -26,8 +26,9 @@ While there are many advantages of using design patterns, it is also important t
 
 - **Overcomplication**: If managed poorly, they can make the application’s architecture unnecessarily complex.
 - **Steep learning curve**: Developers unfamiliar with certain patterns might find it confusing to understand why they are being used.
+---
 
-# Types of Design Patterns
+## Types of Design Patterns
 
 Now, we’ll look at some popular design patterns in JavaScript. These include the following:
 
