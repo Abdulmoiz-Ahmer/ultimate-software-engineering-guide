@@ -39,7 +39,7 @@ These patterns are used to provide a mechanism for creating objects in a specifi
 The normal approach for creating an object might lead to complexities in the design of a project.  
 These patterns allow flexibility in deciding which objects need to be created for a specific use case by providing **control over the creation process**.
 
----structural copy
+---
 
 ## Structural Design Patterns
 
