@@ -6,7 +6,7 @@ The singleton pattern is a type of creational pattern that restricts the instant
 
 A real-life example is a printer a couple of office employees want to use. It'll be a shared resource amongst all the employees. Hence, a single instance of the printer is required so that everyone can share instead of having a new instance for each employee who wants to print something.
 
-```Javascript
+```javascript
 let instance = null;
 class Printer {
   constructor(pages) {
@@ -38,25 +38,25 @@ In the example above, we are implementing the singleton pattern. The class Print
 
 The getInstance function accepts the parameter numOfpages. Inside the function, in line 10, we check if an instance for the Printer class already exists.
 
-```Javascript
+```javascript
 if(!instance) //line 10
 ```
 
 If it does not exist, the code inside the if condition executes and a new instance is created.
 
-```Javascript
+```javascript
 instance = new Printer(numOfpages)
 ```
 
 However, if an instance already exists, it simply returns the existing instance instead of creating a new one.
 
-```Javascript
+```javascript
 return instance
 ```
 
 You can see this in the output as well. We create an instance of the Printer with 2 passed as the argument to getInstance:
 
-```Javascript
+```javascript
 var obj1 = Printer.getInstance(2)
 console.log(obj1) //line 18
 obj1.display() //line 19
@@ -64,14 +64,14 @@ obj1.display() //line 19
 
 For lines 18 & 19, you see the following output on the console:
 
-```Javascript
+```javascript
 "Printer { display: [Function] }"
 "You are connected to the printer. You want to print 2 pages."
 ```
 
 Next, we try to create a second instance of the Printer with 3 passed as the argument to getInstance.
 
-```Javascript
+```javascript
 var obj2 = Printer.getInstance(3)
 console.log(obj2) //line 21
 obj2.display() //line 22
@@ -79,14 +79,14 @@ obj2.display() //line 22
 
 You can see the following output for the commands on lines 21 & 22:
 
-```Javascript
+```javascript
 "Printer { display: [Function] }"
 "You are connected to the printer. You want to print 2 pages."
 ```
 
 As you can see, instead of a new instance, the same instance is returned. Hence, obj2.display shows 2 pages instead of 3 pages. Line 23 also returns true, showing that both the instances are the same.
 
-```Javascript
+```javascript
 console.log(obj2 == obj1) //line 23
 ```
 
