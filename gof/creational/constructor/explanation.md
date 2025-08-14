@@ -19,7 +19,7 @@ However, in JavaScript, the use of the **constructor pattern** is very popular a
 
 ### Example Code
 
-```javascript
+```Javascript
 function Human(name, age, occupation) {
   // ES5 function-based constructor
   // Defining properties inside the constructor function
@@ -54,13 +54,13 @@ Properties:
 
 Method:
 
-```javascript
+```Javascript
 describe();
 ```
 
 When we run:
 
-```javascript
+```Javascript
 var person = new Human("Elle", "23", "Engineer");
 ```
 
@@ -72,13 +72,13 @@ The object also gets the describe method.
 
 ## When we call:
 
-```javascript
+```Javascript
 person.describe();
 ```
 
 It outputs:
 
-```javascript
+```Javascript
 Elle is a 23-year-old Engineer
 ```
 
@@ -86,7 +86,7 @@ Elle is a 23-year-old Engineer
 
 Inside the constructor function:
 
-```javascript
+```Javascript
 this.name = name;
 this.age = age;
 this.occupation = occupation;
@@ -96,7 +96,7 @@ this refers to the new object being created (person in this case).
 
 Similarly, in:
 
-```javascript
+```Javascript
 console.log(`${this.name} is a ${this.age}-year-old ${this.occupation}`);
 ```
 
@@ -106,7 +106,7 @@ this still refers to the newly created object, which is why it prints the correc
 
 We can use the same constructor to create multiple objects:
 
-```javascript
+```Javascript
 function Human(name, age, occupation) {
   this.name = name;
   this.age = age;
@@ -126,7 +126,7 @@ newperson.describe();
 
 Output:
 
-```javascript
+```Javascript
 Elle is a 23-year-old Engineer
 Joe is a 13-year-old Painter
 ```

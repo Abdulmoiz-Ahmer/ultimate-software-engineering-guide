@@ -12,7 +12,7 @@ Instead, it provides a **generic interface** that delegates the object creation 
 
 As the name _factory_ implies, we can use this pattern when we want to create different objects that share similar characteristics.
 
-```javascript
+```Javascript
 class IceCreamFactory {
   constructor() {
     this.createIcecream = function (flavor) {
