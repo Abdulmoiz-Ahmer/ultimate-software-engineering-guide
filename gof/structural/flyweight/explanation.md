@@ -141,5 +141,3 @@ The formatter instance created in this example, that is, the Python or Java form
 This pattern should be used when your application has plenty of objects using similar data or when memory storage cost is high. JavaScript uses this pattern to share a list of immutable strings across the application.
 
 This pattern is mostly used in applications like network apps or word processors. It can also be used in web browsers to prevent loading the same images twice. The flyweight pattern allows caching of images. Therefore, when a web page loads, only the new images are loaded from the Internet, the already existing ones are fetched from the cache.
-
-Now that you know what a flyweight pattern is, it’s time to implement it!

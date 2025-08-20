@@ -81,7 +81,6 @@ true;
 Take a close look at this problem and design a step-by-step solution before jumping on to the implementation. This problem is designed for your practice, so try to solve it on your own first. If you get stuck, you can always refer to the solution provided. Good luck!
 
 ```javascript
-//Component
 class Dress {
   constructor(serialNumber, type, color, designer, availability) {
     this.serialNumber = serialNumber;
