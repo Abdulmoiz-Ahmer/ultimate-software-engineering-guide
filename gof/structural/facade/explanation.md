@@ -8,7 +8,7 @@ A simple example of the facade pattern is placing an order at a restaurant. Imag
 
 How was your food made? Which chef was assigned the task to make your food? What ingredients were used? How much stock was used or left afterward? Who cleaned the kitchen after your food had been prepared? All of these complexities are hidden from you. These are the unnecessary details that you as a customer, don’t need to know.
 
-The illustration above presents a visualization of this situation. Now, let’s look at an example of how we’ll write the code for this scenario.
+Now, let’s look at an example of how we’ll write the code for this scenario.
 
 ```javascript
 let orderNumber = 0;
