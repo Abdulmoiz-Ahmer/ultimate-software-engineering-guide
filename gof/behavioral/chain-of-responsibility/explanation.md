@@ -143,9 +143,9 @@ c2 checks 95 % 3. The condition is false.
 
 c2 passes the request to the next object, c3 (MultipleofFiveHandler).
 
-c3 checks 95 % 5. The condition is true. It handles the request by printing "Multiple of 5: 95" and the chain stops. ✅
+c3 checks 95 % 5. The condition is true. It handles the request by printing "Multiple of 5: 95" and the chain stops.
 
-## When to Use the Chain of Responsibility Pattern? 🤔
+## When to Use the Chain of Responsibility Pattern?
 
 You should consider using this pattern when:
 
