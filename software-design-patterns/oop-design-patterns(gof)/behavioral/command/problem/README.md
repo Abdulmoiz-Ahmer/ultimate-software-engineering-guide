@@ -1,51 +1,84 @@
-# Challenge: Iterator Pattern
+# Challenge: Command Pattern
 
 ## Problem Statement
 
-In this challenge, you have to reverse iterate a simple hashmap and display its key values.
+```javascript
+class BankAccount {
+  constructor(amount) {
+    this.amount = amount;
+  }
 
-You need to implement the **reverseIterate** function that accepts the hashmap, **items**, and displays the key values in reverse. To reverse iterate, make use of the **ReverseIterator** class. It contains the following functions:
+  checkAmount() {
+    console.log(this.amount);
+  }
 
-- **hasprevElement**: checks if there is a previous element
+  withdrawMoney(withdrawamount) {
+    if (withdrawamount > this.amount) {
+      console.log("Not enough money");
+    } else {
+      this.amount -= withdrawamount;
+    }
+  }
+  depositAmount(money) {
+    this.amount += money;
+  }
+}
 
-- **last**: returns the last key value in the map
+var account = new BankAccount(100);
+account.checkAmount();
+account.withdrawMoney(10);
+account.checkAmount();
+account.depositAmount(50);
+account.checkAmount();
+```
 
-- **previous**: returns the previous key value in the map
+In the code above, you have a **BankAccount** class. You can check the **amount** in the account using the **checkAccount** function, withdraw a certain amount using the **withdrawMoney** function, and deposit an amount using the **depositAmount** function.
 
-Apart from the functions mentioned above, you also need to define its constructor.
+Your task is to modify the code above by using the command pattern. Remember, the pattern has the following parts:
+
+- **commands**: **WithDraw**, **DepositAmount**, and **CheckAmount**
+
+- **receiver**: **BankAccount**
+
+- **invoker**: an **AccountManager** carrying out the operations requested using a request function
+
+Use your knowledge of the pattern to divide your code into these objects.
 
 ---
 
 ## Input
 
-Calling **reverseIterate** function on a simple hashmap
+Sending commands to carry out operations such as **withdrawMoney**, **checkAmount**, and **depositAmount**
 
 ---
 
 ## Output
 
-Hashmap’s values displayed in reverse order
+The **amount** in the account after operations are performed
 
 ---
 
 ## Sample Input
 
 ```javascript
-reverseIterate({
-  name: "Anne",
-  age: "23",
-  gender: "Female",
-  Occupation: "Engineer",
-});
+const manager = new AccountManager();
+const account = new BankAccount(100);
+const check = new CheckAmount(account);
+manager.request(check);
+const withdraw = new WithDrawAmount(account);
+const deposit = new DepositAmount(account);
+manager.request(withdraw, 10);
+manager.request(check);
+manager.request(deposit, 50);
+manager.request(check);
 ```
 
 ## Sample Output
 
 ```javascript
-"Engineer";
-"Female";
-"23";
-"Anne";
+100;
+90;
+140;
 ```
 
 ## Challenge
@@ -53,17 +86,24 @@ reverseIterate({
 Take a close look at this problem and design a step-by-step solution before jumping on to the implementation. This problem is designed for your practice, so try to solve it on your own first. If you get stuck, you can always refer to the solution provided. Good luck!
 
 ```javascript
-class ReverseIterator {
-  //define-your-reverse-iterator-here
-  hasprevElement() {}
-  last() {}
-  previous() {}
-}
+class BankAccount {
+  constructor(amount) {
+    this.amount = amount;
+  }
 
-function reverseIterate(items) {
-  //write-your-code-here
-  //to display the values of keys
-  //in items in reverse
-  console.log(items);
+  checkAmount() {
+    console.log(this.amount);
+  }
+
+  withdrawMoney(withdrawamount) {
+    if (withdrawamount > this.amount) {
+      console.log("Not enough money");
+    } else {
+      this.amount -= withdrawamount;
+    }
+  }
+  depositAmount(money) {
+    this.amount += money;
+  }
 }
 ```

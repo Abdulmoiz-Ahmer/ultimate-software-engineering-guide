@@ -1,142 +1,219 @@
-# What is the iterator pattern?
+# What is the command pattern?
 
-The iterator pattern allows the definition of various types of iterators that can be used to iterate a collection of objects sequentially without exposing the underlying form.
+The command pattern allows encapsulation of the requests or operations into separate objects. It decouples the objects that send requests from the objects responsible for executing those requests.
 
-Iterators encapsulate how the traversal occurs in an iteration. Most languages have built-in iterators such as IEnumerable and IEnumerator. However, JavaScript only supports basic looping constructs like for loop, for-in loop, while loop etc. The iterator pattern allows JavaScript developers to build other complex iterators which can be used to easily traverse collections that are stored in something complex such as graphs or trees. These iterators can then be used by the client to traverse a collection without having to know their inner workings.
+Consider an example where the client is accessing the methods of an API directly throughout the application. What will happen if the implementation of that API changes? The change will have to be made everywhere the API is being used. To avoid this, we could make use of abstraction and separate the objects requesting from those implementing the request. Now, if a change occurs, only the object making the call will need to change.
 
-Iterators follow the behavior where they call a next function and step through a set of values until they reach the end. To do this, they need to maintain a reference to the current position as well as the collection they are traversing. Hence, an iterator has functions such as next, hasNext, currentItem, and each.
+This pattern has 4 concepts:
+
+- **Invoker**: asks the command to carry out the request
+- **Command**: has information about the action and binds it to the receiver by invoking the corresponding operation on it
+- **Receiver**: knows how to perform the operations associated with the command
+- **Client**: creates a command and sets the receiver who’ll receive the command
+
+Example
+Now, let’s write the code implementing a printer.
 
 ```javascript
-class Iterator {
-  constructor(elements) {
-    this.index = 0;
-    this.elements = elements;
+class Command {
+  execute() {}
+}
+
+//TurnOnPrinter command
+class TurnOnPrinter extends Command {
+  constructor(printingMachine) {
+    super();
+    this.printingMachine = printingMachine;
+    this.commandName = "turn on";
   }
-  next() {
-    return this.elements[this.index++];
-  }
-  hasNextElement() {
-    return this.index <= this.elements.length;
-  }
-  first() {
-    this.index = 0;
-    return this.next();
+
+  execute() {
+    this.printingMachine.turnOn();
   }
 }
 
-function iterate() {
-  var items = ["Yellow", "Green", "Blue"];
-  var iter = new Iterator(items);
-  for (var i = iter.first(); iter.hasNextElement(); i = iter.next()) {
-    console.log(i);
+//TurnOffPrinter command
+class TurnOffPrinter extends Command {
+  constructor(printingMachine) {
+    super();
+    this.printingMachine = printingMachine;
+    this.commandName = "turn off";
+  }
+
+  execute() {
+    this.printingMachine.turnOff();
   }
 }
 
-iterate();
+//Print command
+class Print extends Command {
+  constructor(printingMachine) {
+    super();
+    this.printingMachine = printingMachine;
+    this.commandName = "print";
+  }
+
+  execute() {
+    this.printingMachine.print();
+  }
+}
+
+//Invoker
+class PrinterControlPanel {
+  pressButton(command) {
+    console.log(`Pressing ${command.commandName} button`);
+    command.execute();
+  }
+}
+
+//Reciever:
+class PrintingMachine {
+  turnOn() {
+    console.log("Printing machine has been turned on");
+  }
+
+  turnOff() {
+    console.log("Printing machine has been turned off");
+  }
+
+  print() {
+    console.log("The printer is printing your document");
+  }
+}
+
+const printingMachine = new PrintingMachine();
+const turnOnCommand = new TurnOnPrinter(printingMachine);
+const turnOffCommand = new TurnOffPrinter(printingMachine);
+const printCommand = new Print(printingMachine);
+const controlPanel = new PrinterControlPanel();
+controlPanel.pressButton(turnOnCommand);
+controlPanel.pressButton(turnOffCommand);
+controlPanel.pressButton(printCommand);
 ```
 
 ## Explanation
 
-In the code above, we created an Iterator class that initializes the following properties:
-
-- index: to keep track of the elements in the collection
-
-- elements: the data to traverse
+In the example above, we have a **PrintingMachine**.
 
 ```javascript
-class Iterator {
-  constructor(elements) {
-    this.index = 0;
-    this.elements = elements;
+class PrintingMachine {
+  turnOn() {
+    console.log("Printing machine has been turned on");
   }
-  //code...
+
+  turnOff() {
+    console.log("Printing machine has been turned off");
+  }
+
+  print() {
+    console.log("The printer is printing your document");
+  }
 }
 ```
 
-As discussed, an iterator is used to traverse a collection. Hence, it should consist of methods such as:
+We can perform the following operations with the printingMachine:
 
-- next: to move to the next element in the collection
+- **turnOn**: turn on the machine
+
+- **turnOff**: turn off the machine
+
+- **print**: print a document using the machine
+
+Whenever the printing machine receives a command for either of these operations, it executes them. From this, we know that there are three types of commands a user can send to the printer:
 
 ```javaScript
-next(){
-  return this.elements[this.index++];
-}
+class TurnOnPrinter extends Command {/*code*/}
+
+class TurnOffPrinter extends Command {/*code*/}
+
+class Print extends Command {/*code*/}
 ```
 
-- hasNextElement: to check if the next element exists in the collection
+All three classes extend the abstract **Command** class:
 
 ```javascript
-hasNextElement() {
-  return this.index <= this.elements.length;
+class Command {
+  execute() {}
 }
 ```
 
-- first: to move to the first element of the collection
+The child classes inherit the **execute** function and define it accordingly. Let’s look at each command one by one below:
 
 ```javascript
-first(){
-  this.index = 0;
-  return this.next()
-}
+class TurnOnPrinter extends Command {
+  constructor(printingMachine) {
+    super();
+    this.printingMachine = printingMachine;
+    this.commandName = "turn on";
+  }
 
+  execute() {
+    this.printingMachine.turnOn();
+  }
+}
 ```
 
-Finally, to use this iterator, we implement the iterate function like so:
+The constructor takes the **printingMachine** as a parameter, as the command will be sent to this machine. It also initializes the variable **commandName**, which is set to **turn on**.
+
+Next, it defines the **execute** function, which will perform the task of turning on the printing machine when invoked.
+
+The commands: **TurnOffPrinter** and **Print** have similar definitions. For the **TurnOffPrinter** command, the **commandName** variable is set to **turn off** and for the Print command, it is set to **print**.
 
 ```javascript
-function iterate() {
-  var items = ["Yellow", "Green", "Blue"];
-  var iter = new Iterator(items);
-  for (var i = iter.first(); iter.hasNextElement(); i = iter.next()) {
-    console.log(i);
-  }
+class TurnOffPrinter extends Command {
+   //code...
+   this.commandName = "turn off"
+   //code..
+}
+
+class Print extends Command {
+   //code...
+   this.commandName = "print"
+   //code..
 }
 ```
 
-We make an array called items and pass it to the Iterator. Next, we implement a for loop that uses the .first, .hasNextElement, and .next methods to traverse and display the elements one by one.
-
-Just like the for loop, we can also use the each method to traverse the elements of a collection. Let’s look at its implementation below:
+Similarly, they define the **execute** function, which turns off the machine when the **TurnOffPrinter** command is executed and prints when the **Print** command is executed.
 
 ```javascript
-class Iterator {
-  constructor(elements) {
-    this.index = 0;
-    this.elements = elements;
-  }
-  next() {
-    return this.elements[this.index++];
-  }
-  hasNextElement() {
-    return this.index <= this.elements.length;
-  }
-  first() {
-    this.index = 0;
-    return this.next();
-  }
-  each(func) {
-    for (var item = this.first(); this.hasNextElement(); item = this.next()) {
-      func(item);
-    }
+class TurnOffPrinter extends Command {
+  //code...
+  execute() {
+    this.printingMachine.turnOff();
   }
 }
 
-function iterate() {
-  var items = ["Yellow", "Green", "Blue"];
-  var iter = new Iterator(items);
-  iter.each(function (item) {
-    console.log(item);
-  });
+class Print extends Command {
+  //code...
+  execute() {
+    this.printingMachine.print();
+  }
 }
-
-iterate();
 ```
 
-As you can see, the each method itself uses the for loop. However, the client will not be able to see that. They’ll call the each method directly without knowing its underlying implementation.
+So, how are these commands invoked? The invoker is the control panel of the printer. It has the turn on, turn off, and print buttons that the user will press to send a command.
 
-each takes a function func. It then uses the for loop and the .next, .hasNext, and .first methods to traverse the elements. For each element, it invokes the func function.
+```javascript
+class PrinterControlPanel {
+  pressButton(command) {
+    console.log(`Pressing ${command.commandName} button`);
+    command.execute();
+  }
+}
+```
 
-## When to Use the iterator pattern?
+A user will press the button for the command they want to execute. Let’s look at an example:
 
-This pattern can be used when dealing with problems explicitly related to iteration, for designing flexible looping constructs and accessing elements from a complex collection without knowing the underlying representation. You can use it to implement a generic iterator that traverses any collection independent of its type efficiently.
+```javascript
+controlPanel.pressButton(turnOnCommand);
+```
 
-Now that you know what an iterator pattern is, it’s time to implement it!
+Here, the user presses the button for turning the printer on. When the button is pressed, the **execute** function for this command will get executed, and you’ll see the following message: **Printing machine has been turned on.**
+
+## When to Use the command pattern?
+
+You can use it if you want to:
+
+- queue and execute requests at different times
+- perform operations such as reset or undo
+- keep a history of requests made
