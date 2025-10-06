@@ -1,4 +1,4 @@
-## About the Pattern: Two Pointers
+# About the Pattern: Two Pointers
 
 The **two pointers pattern** is a versatile technique used in problem-solving to efficiently traverse or manipulate sequential data structures, such as arrays or linked lists. As the name suggests, it involves maintaining two pointers that traverse the data structure in a coordinated manner — typically starting from different positions or moving in opposite directions.
 

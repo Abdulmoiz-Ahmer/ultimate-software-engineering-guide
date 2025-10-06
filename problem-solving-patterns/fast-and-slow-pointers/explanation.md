@@ -1,4 +1,4 @@
-## About the Pattern: Fast and Slow Pointers
+# About the Pattern: Fast and Slow Pointers
 
 Similar to the **two pointers** pattern, the **fast and slow pointers** pattern uses two pointers to traverse an iterable data structure, but at **different speeds**. It is often used to detect cycles or find specific targets.
 
