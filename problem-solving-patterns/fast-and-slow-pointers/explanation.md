@@ -6,7 +6,7 @@ While the two pointers technique focuses on comparing data values, the fast and 
 
 ---
 
-### Key Idea
+## Key Idea
 
 - **Both pointers start at the same position**.
 - **Slow pointer** moves **one step** at a time.

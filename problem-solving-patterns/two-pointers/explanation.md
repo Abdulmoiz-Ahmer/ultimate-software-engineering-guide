@@ -11,7 +11,7 @@ For example, to check whether a string is a palindrome:
 - The other starts from the **end**.
 - At each step, compare the values of both pointers to see if they match.
 
-### Efficiency Comparison
+## Efficiency Comparison
 
 The **naive approach** to solving this problem would use nested loops, resulting in a time complexity of **O(n²)**.  
 However, by using two pointers moving toward the middle from both ends, we exploit the **symmetry property** of palindromic strings.  
