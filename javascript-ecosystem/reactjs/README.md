@@ -35,15 +35,36 @@ React (maintained by Meta) is used to build single-page applications and mobile 
 
 ## Concepts
 
+### Core Mental Models
+
+- **[Render and Commit](https://react.dev/learn/render-and-commit)** - What and how of react renders
+- **[Why React Re-Renders](https://www.joshwcomeau.com/react/why-react-re-renders/)** - Why of react rerenders
+
 ### Higher Order Components
 
 - **[Mastering React Memo](https://www.youtube.com/watch?v=DEPwA3mv_R8)** - When to use React memo
 
 ### React Hooks
 
-- **[Why React Re-Renders](https://overreacted.io/a-complete-guide-to-useeffect/)** - Why of react rerenders
+- **[Referencing Values with Refs](https://react.dev/learn/referencing-values-with-refs)** - The escape hatch of react renders
+- **[Synchronizing with Effects](https://react.dev/learn/synchronizing-with-effects)** - Everything about effects
+- **[You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect)** -
+- **[Removing Effect Dependencies](https://react.dev/learn/removing-effect-dependencies)** - How to get rid of effects dependencies
 - **[A Complete Guide to useEffect](https://overreacted.io/a-complete-guide-to-useeffect/)** - The under the hood of the useEffect.
-
+- **[Mastering React's useEffect](https://www.youtube.com/watch?v=dH6i3GurZW8/)** - Tips and techiniques to tame useEffect.
 - **[When to useMemo and useCallback](https://kentcdodds.com/blog/usememo-and-usecallback)** - The under the hood of the usememo and use callback.
+- **[Reusing Logic with Custom Hooks](https://react.dev/learn/reusing-logic-with-custom-hooks)** - The under the hood of the usememo and use callback.
+
+### Performance
+
+- **[lazy](https://react.dev/reference/react/lazy)** - Lazy loading components
+
+### Testing
+
+- **[Static vs Unit vs Integration vs E2E Testing for Frontend Apps](https://kentcdodds.com/blog/static-vs-unit-vs-integration-vs-e2e-tests)** - Types of testing
+- **[Mocking REST API in Unit Test Using MSW](https://www.thisdot.co/blog/mocking-rest-api-in-unit-test-using-msw)** - Mocking api server
+- **[Seamless API Mocking in Tests with Mock Service Worker](https://leapcell.io/blog/seamless-api-mocking-in-tests-with-mock-service-worker)** - Mocking api server
+- **[React Hooks Testing Library](https://react-hooks-testing-library.com/usage/basic-hooks)** - React hooks testing library
+- **[Common mistakes with React Testing Library](https://kentcdodds.com/blog/common-mistakes-with-react-testing-library)** - What not to do when using rtl
 
 ---
