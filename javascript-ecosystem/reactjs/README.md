@@ -8,6 +8,8 @@ A comprehensive guide and resource list for mastering React.js, from fundamental
 - [Core Concepts](#core-concepts)
 - [Higher Order Components](#higher-order-components)
 - [React Hooks](#react-hooks)
+- [Performance](#performance)
+- [Testing](#testing)
 
 ---
 
@@ -46,6 +48,7 @@ React (maintained by Meta) is used to build single-page applications and mobile 
 
 ### React Hooks
 
+- **[useState, useReducer and useContext](https://kentcdodds.com/blog/application-state-management-with-react)** - Which one is sufficent in what cases
 - **[Referencing Values with Refs](https://react.dev/learn/referencing-values-with-refs)** - The escape hatch of react renders
 - **[Synchronizing with Effects](https://react.dev/learn/synchronizing-with-effects)** - Everything about effects
 - **[You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect)** -
@@ -54,6 +57,8 @@ React (maintained by Meta) is used to build single-page applications and mobile 
 - **[Mastering React's useEffect](https://www.youtube.com/watch?v=dH6i3GurZW8/)** - Tips and techiniques to tame useEffect.
 - **[When to useMemo and useCallback](https://kentcdodds.com/blog/usememo-and-usecallback)** - The under the hood of the usememo and use callback.
 - **[Reusing Logic with Custom Hooks](https://react.dev/learn/reusing-logic-with-custom-hooks)** - The under the hood of the usememo and use callback.
+- **[Compound component and Hooks](https://kentcdodds.com/blog/compound-components-with-react-hooks)** - How we can use hooks custom and builtin with Compound components.
+- **[Third party hooks library](https://usehooks-ts.com/introduction)** - The third party npm package that has many use full hooks in it.
 
 ### Performance
 
