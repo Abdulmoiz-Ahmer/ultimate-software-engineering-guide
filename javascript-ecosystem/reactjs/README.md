@@ -48,7 +48,9 @@ React (maintained by Meta) is used to build single-page applications and mobile 
 
 ### React Hooks
 
-- **[useState, useReducer and useContext](https://kentcdodds.com/blog/application-state-management-with-react)** - Which one is sufficent in what cases
+- **[Application State Management with React](https://kentcdodds.com/blog/application-state-management-with-react)** - Which state is sufficent in which case
+- **[How to use React Context effectively](https://kentcdodds.com/blog/how-to-use-react-context-effectively)** - All about useContext.
+- **[Scaling Up with Reducer and Context](https://react.dev/learn/scaling-up-with-reducer-and-context)** - Using reducer and context together
 - **[Referencing Values with Refs](https://react.dev/learn/referencing-values-with-refs)** - The escape hatch of react renders
 - **[Synchronizing with Effects](https://react.dev/learn/synchronizing-with-effects)** - Everything about effects
 - **[You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect)** -
@@ -63,6 +65,7 @@ React (maintained by Meta) is used to build single-page applications and mobile 
 ### Performance
 
 - **[lazy](https://react.dev/reference/react/lazy)** - Lazy loading components
+- **[Intro to re-renders](https://www.youtube.com/watch?v=qTDnwmMF5q8&list=PL6dw1BPCcLC4n-4o-t1kQZH0NJeZtpmGp)** - Why react rerenders and what can be done about it
 
 ### Testing
 
