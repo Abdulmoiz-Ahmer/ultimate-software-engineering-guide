@@ -22,3 +22,94 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg
+
+# Virtual environments
+venv/
+venv311/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment variables
+.env
+.env.local
+*.env
+
+# Logs
+logs/*.log
+logs/*.txt
+*.log
+
+# Model cache and downloads
+models/
+*.pt
+*.pth
+*.bin
+*.bin/*
+*.onnx
+.cache/
+
+# Hugging Face cache
+.huggingface/
+
+# Vector store data
+*.faiss
+*.pkl
+*.pickle
+vectorstore/data/*
+!vectorstore/data/.gitkeep
+
+# ChromaDB databases
+chroma_db/
+*_chroma_db/
+test_chroma_db/
+quick_test_db/
+pipeline_test_db/
+*.sqlite3
+*.parquet
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
