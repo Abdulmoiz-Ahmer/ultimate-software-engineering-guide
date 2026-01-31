@@ -1,6 +1,6 @@
 import os
 from google import genai
-from google.genai import types # <--- NEW: Needed for configuring the bot's settings
+from google.genai import types 
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -23,7 +23,6 @@ Rules:
 - Output ONLY the rewritten text. Do not add "Here is the rewritten version:".
 """
 
-# Create the chat with the specific config
 chat = client.chats.create(
     model="gemini-2.5-flash",
     config=types.GenerateContentConfig(
@@ -46,7 +45,6 @@ while True:
     try:
         response = chat.send_message(user_input)
         
-        # We print it in Green (if terminal supports it) or just standard
         print(f"\n✨ Professional: {response.text}")
         print("-" * 100)
         
