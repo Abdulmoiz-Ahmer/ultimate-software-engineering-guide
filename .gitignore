@@ -65,7 +65,7 @@ venv.bak/
 # Environment variables
 .env
 .env.local
-*.env
+.env
 
 # Logs
 logs/*.log
