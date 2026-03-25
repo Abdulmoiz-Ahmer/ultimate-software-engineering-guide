@@ -19,9 +19,9 @@ sentences = [
 print("\nConverting sentences to vectors (embeddings)...")
 embeddings = model.encode(sentences)
 
-print("-" * 50)
+print("-" * 100)
 print("Semantic Similarity Results")
-print("-" * 50)
+print("-" * 100)
 
 # Use the first sentence as the target to compare against all others
 target_index = 0
