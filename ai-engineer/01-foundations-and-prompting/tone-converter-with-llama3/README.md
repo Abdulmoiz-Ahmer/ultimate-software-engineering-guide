@@ -1,12 +1,11 @@
 # Tone Converter with Llama 3 (Local/Offline)
 
-A fully local tone converter that combines **input moderation** and **professional rewriting** using **Llama 3** via [Ollama](https://ollama.com/). No API keys or cloud services required.
+A fully local tone converter that rewrites angry or rude text into professional, polite language using **Llama 3** via [Ollama](https://ollama.com/). No API keys or cloud services required.
 
 ## Features
 
 - **Fully Local:** Runs entirely on your machine using Ollama + Llama 3.
-- **Safety Guardrail:** Screens input for hate speech, violence, and other unsafe content before processing.
-- **Tone Conversion:** Rewrites angry/rude text into professional, polite language.
+- **Tone Conversion:** Rewrites aggressive text into professional, constructive language using prompt engineering.
 - **No API Key Needed:** Zero cloud dependencies.
 
 ## Prerequisites
