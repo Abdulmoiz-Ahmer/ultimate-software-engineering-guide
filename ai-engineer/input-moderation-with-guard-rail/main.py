@@ -31,7 +31,7 @@ while True:
         break
 
     try:
-        moderation_reponse = client.models.generate_content(
+        moderation_response = client.models.generate_content(
             model=MODERATION_MODEL,
             contents=f"Analyze this text:{user_input}",
             config=types.GenerateContentConfig(
@@ -41,9 +41,9 @@ while True:
             )
         )
 
-        safety_repsonse = json.loads(moderation_reponse.text)
-        is_safe = safety_repsonse.get("is_safe", False)
-        reason = safety_repsonse.get("reason", "Unknown safety error")
+        safety_response = json.loads(moderation_response.text)
+        is_safe = safety_response.get("is_safe", False)
+        reason = safety_response.get("reason", "Unknown safety error")
 
         if not is_safe:
             print(f"Safety Reason: {reason}")
