@@ -1,17 +1,9 @@
 import ollama
-import json
 
-MODERATION_INSTRUCTION = """
-You are a content safety shield. Analyze the user's input.
-Return a valid JSON object: {"is_safe": boolean, "reason": "string"}.
-Rules:
-- Block hate speech, violence, illegal acts, and personal insults.
-- Allow casual conversation and technical questions.
-- If unsafe, provide a short, polite reason.
-"""
-
+# System prompt — gives the model a "Corporate Communications Specialist" persona
+# that rewrites angry text into professional language
 SYS_INSTRUCT = """
-You are a Senior Corporate Communications Specialist. 
+You are a Senior Corporate Communications Specialist.
 Your task is to rewrite the user's input to be:
 1. Professional and polite.
 2. Constructive (focus on solutions, not blame).
@@ -28,38 +20,17 @@ print("Welcome to Secure Local Chatbot")
 print("Type 'q' or 'e' to exit.")
 print("-" * 100)
 
+# Main loop — keeps accepting input until the user quits
 while True:
     user_input = input("\nAngry Input: ")
-    
+
+    # Exit condition
     if user_input.lower() in ['q', 'e', 'quit', 'exit']:
         break
 
-    print("   [1/2] Checking safety...")
-    
     try:
-        moderation_response = ollama.chat(
-            model='llama3',
-            format='json',
-            messages=[
-                {"role": "system", "content": MODERATION_INSTRUCTION},
-                {"role": "user", "content": f"Analyze this text:{user_input}"}
-            ]
-        )
-        
-        safety_response = json.loads(moderation_response.text)
-        is_safe = safety_response.get("is_safe", False)
-        reason = safety_response.get("reason", "Unknown safety error")   
-        
-        if not is_safe:
-            print(f"Safety Reason: {reason}")
-            continue
-
-    except Exception as e:
-        print(f"Safety Reason: {e}")
-        
-        
-    try:
-        print("   [2/2] Rewriting input...")
+        print("Rewriting input...")
+        # Send to local Llama 3 model via Ollama with system prompt and user input
         response = ollama.chat(
             model='llama3',
             messages=[
@@ -67,6 +38,7 @@ while True:
                 {"role": "user", "content": user_input}
             ]
         )
-        print(f"Bot:{response}")
+        # Extract the message content from Ollama's response dict
+        print(f"Bot:{response['message']['content']}")
     except Exception as e:
-        print(f"Bot:{e}")           
+        print(f"Bot:{e}")
