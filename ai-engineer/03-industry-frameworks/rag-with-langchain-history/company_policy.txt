@@ -1,0 +1,6 @@
+Welcome to CyberCorp. 
+The Wi-Fi password for the guest network is "Guest2026!". 
+Employees are allowed 15 days of paid time off (PTO) per year. 
+If the main server crashes, immediately contact the IT lead, Sarah Connor, at extension 404. 
+The cafeteria is open from 11:30 AM to 1:30 PM and serves free coffee all day.
+All code must be committed to the main repository by 5:00 PM on Fridays.
