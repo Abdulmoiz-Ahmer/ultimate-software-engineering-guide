@@ -11,7 +11,10 @@ from langchain_classic.chains import create_retrieval_chain, create_history_awar
 print("Building LangChain RAG Pipeline...")
 
 # --- STEP 1: LOAD ---
-# PyPDFLoader reads the source document from disk into LangChain Document objects
+# PyPDFLoader reads a PDF from disk, extracting text page by page.
+# Each page becomes a separate LangChain Document object.
+# Unlike TextLoader, PDFs can fail if the file is missing, corrupt, or password-protected,
+# so we wrap the load in a try/except and exit early with a helpful message.
 pdf_path = "typesofpl.pdf"
 try:
     loader = PyPDFLoader(pdf_path)

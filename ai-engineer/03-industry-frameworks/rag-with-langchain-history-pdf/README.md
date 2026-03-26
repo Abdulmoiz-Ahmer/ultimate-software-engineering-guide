@@ -1,27 +1,26 @@
-# RAG with LangChain + Conversation History
+# RAG with LangChain + Conversation History + PDF
 
-Extends the `rag-with-langchain` project with **conversation memory**. The chatbot remembers what was said in previous turns, so follow-up questions like "what about his salary?" are correctly resolved against the document instead of failing or hallucinating.
+Extends `rag-with-langchain-history` with **PDF support**. Swaps `TextLoader` for `PyPDFLoader` so the chatbot can ingest any PDF document, while keeping full conversation memory and history-aware retrieval.
 
-## The Problem This Solves
+## What Changed from rag-with-langchain-history
 
-A basic RAG pipeline treats every question in isolation. If a user asks "Who is the IT lead?" and then follows up with "What is her extension?", the retriever sees "What is her extension?" with no idea who "her" refers to — and retrieves the wrong chunks.
-
-This project fixes that by adding a **rephrasing step** that rewrites follow-up questions into standalone queries before they hit the vector database.
+The only difference is the document loader. `PyPDFLoader` extracts text page by page from a PDF, with error handling for missing or corrupt files. Everything else — chunking, embedding, history-aware retrieval, rolling memory — is identical.
 
 ## How It Works
 
-1. **Load** — `TextLoader` reads the source document from disk.
-2. **Split** — `RecursiveCharacterTextSplitter` chunks the document, preserving sentence boundaries.
-3. **Embed and Store** — `HuggingFaceEmbeddings` converts chunks to vectors; `Chroma` persists them.
+1. **Load** — `PyPDFLoader` reads the PDF from disk, extracting text page by page into LangChain Document objects.
+2. **Split** — `RecursiveCharacterTextSplitter` chunks the pages, preserving sentence boundaries.
+3. **Embed and Store** — `HuggingFaceEmbeddings` converts chunks to vectors; `Chroma` persists them to disk.
 4. **Two Prompts:**
-   - **Rephraser prompt** — given the chat history and the latest question, rewrites it as a self-contained standalone query.
+   - **Rephraser prompt** — rewrites follow-up questions into standalone queries using the chat history.
    - **QA prompt** — answers the rephrased question using only the retrieved context.
-5. **History-Aware Retriever** — `create_history_aware_retriever` wraps the base retriever with the rephraser, so the vector search always receives a clear, context-free query.
+5. **History-Aware Retriever** — `create_history_aware_retriever` rephrases before searching, so the vector database always receives a clear, context-free query.
 6. **Chain** — `create_retrieval_chain` wires everything together; a single `invoke()` runs the full pipeline.
-7. **Rolling Memory** — after each turn, the user message and bot reply are appended to `chat_history` as `HumanMessage` / `AIMessage` objects and passed into the next `invoke()` call.
+7. **Rolling Memory** — each turn's messages are appended to `chat_history` as `HumanMessage` / `AIMessage` objects and passed into the next `invoke()`.
 
 ## Features
 
+- **PDF Ingestion:** Loads any PDF using `PyPDFLoader`, with error handling for missing or unreadable files.
 - **Conversation Memory:** Resolves pronouns and references across multiple turns.
 - **History-Aware Retrieval:** Rephrases follow-up questions before vector search, not after.
 - **Document-Grounded Answers:** The model only answers from the provided document context.
@@ -42,7 +41,7 @@ This project fixes that by adding a **rephrasing step** that rewrites follow-up 
 1. **Navigate to the project:**
 
     ```bash
-    cd ai-engineer/03-industry-frameworks/rag-with-langchain-history
+    cd ai-engineer/03-industry-frameworks/rag-with-langchain-history-pdf
     ```
 
 2. **Set up the Virtual Environment:**
@@ -59,12 +58,14 @@ This project fixes that by adding a **rephrasing step** that rewrites follow-up 
 
 ## Usage
 
+Place your PDF in the project folder and name it `typesofpl.pdf`, then run:
+
 ```bash
 python main.py
 ```
 
-Ask questions about `company_policy.txt`. The chatbot remembers previous turns, so follow-up questions work naturally. Type `q` or `quit` to exit.
+Ask questions about the PDF. The chatbot remembers previous turns, so follow-up questions work naturally. Type `q` or `quit` to exit.
 
 ## Customization
 
-Replace `company_policy.txt` with any text file to chat with your own documents. Adjust `chunk_size`, `chunk_overlap`, and `k` (number of retrieved chunks) to tune retrieval quality.
+Replace `typesofpl.pdf` with any PDF file and update the `pdf_path` variable in `main.py`. Adjust `chunk_size`, `chunk_overlap`, and `k` (number of retrieved chunks) to tune retrieval quality.
