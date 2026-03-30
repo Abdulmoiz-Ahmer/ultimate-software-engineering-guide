@@ -1,0 +1,5 @@
+langchain-core
+langchain-classic
+langchain-ollama
+langchain-tavily
+python-dotenv
