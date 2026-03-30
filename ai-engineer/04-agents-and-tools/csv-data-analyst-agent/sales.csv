@@ -1,0 +1,6 @@
+Date,Region,Product,Units_Sold,Price_Per_Unit,Total_Sales
+2026-01-01,North,Widget A,100,10.50,1050.00
+2026-01-02,South,Widget B,50,20.00,1000.00
+2026-01-03,East,Widget A,120,10.50,1260.00
+2026-01-04,West,Widget C,30,50.00,1500.00
+2026-01-05,North,Widget B,80,20.00,1600.00
