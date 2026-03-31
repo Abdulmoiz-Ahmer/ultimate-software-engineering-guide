@@ -10,19 +10,19 @@ TextLoader -> RecursiveCharacterTextSplitter -> HuggingFace + Chroma -> Retrieve
    Load doc        Smart chunking           Embed & store           Vector search     LLM answer
 ```
 
-1. **Load** -- `TextLoader` reads the source document into LangChain Document objects.
+1. **Load** -- `TextLoader` reads the source document into Document objects.
 2. **Split** -- `RecursiveCharacterTextSplitter` chunks the document intelligently, splitting on paragraphs first, then sentences, then words.
-3. **Embed and store** -- `HuggingFaceEmbeddings` converts chunks to vectors; `Chroma` stores them on disk.
-4. **Retrieve** -- `as_retriever` wraps the vector store and fetches the top 2 most relevant chunks per query.
-5. **Generate** -- `ChatOllama` (Llama 3) generates an answer grounded in the retrieved context.
-6. **Chain** -- `create_retrieval_chain` wires all steps together; a single `invoke()` runs the full pipeline.
+3. **Embed and store** -- Embeddings convert chunks to vectors; a vector store persists them on disk.
+4. **Retrieve** -- a retriever wraps the vector store and fetches the top 2 most relevant chunks per query.
+5. **Generate** -- a local LLM generates an answer grounded in the retrieved context.
+6. **Chain** -- a retrieval chain wires all steps together; a single `invoke()` runs the full pipeline.
 
 ## Key concepts
 
-- **`RecursiveCharacterTextSplitter`** -- smarter than fixed-size chunking. Tries paragraph breaks first, then sentences, then words, keeping semantically related text together.
-- **`create_stuff_documents_chain`** -- "stuffs" retrieved chunks into the `{context}` placeholder of the prompt template.
-- **`create_retrieval_chain`** -- connects the retriever and document chain so one `invoke()` call triggers the full pipeline.
-- **Retriever abstraction** -- `as_retriever` wraps any vector store with a consistent search interface, decoupling retrieval from storage.
+- **Smart chunking** -- `RecursiveCharacterTextSplitter` tries paragraph breaks first, then sentences, then words, keeping semantically related text together.
+- **Stuff documents chain** -- "stuffs" retrieved chunks into the `{context}` placeholder of the prompt template.
+- **Retrieval chain** -- connects the retriever and document chain so one `invoke()` call triggers the full pipeline.
+- **Retriever abstraction** -- wraps any vector store with a consistent search interface, decoupling retrieval from storage.
 
 ## Comparison with manual RAG (module 02)
 
@@ -30,31 +30,17 @@ TextLoader -> RecursiveCharacterTextSplitter -> HuggingFace + Chroma -> Retrieve
 |---|---|---|
 | Document loading | `open().read()` | `TextLoader` |
 | Chunking | Custom `get_chunks()` | `RecursiveCharacterTextSplitter` |
-| Embedding | ChromaDB built-in | `HuggingFaceEmbeddings` (explicit model choice) |
+| Embedding | Auto (ChromaDB built-in) | Explicit model choice |
 | Retrieval | `collection.query()` | `retriever` via `as_retriever` |
 | Generation | Manual prompt string | `ChatPromptTemplate` + chain |
 | Orchestration | Hand-written loop | Single `rag_chain.invoke()` |
 
 ## Prerequisites
 
-- Python 3.10+
 - [Ollama](https://ollama.com/) running locally with `llama3` pulled
 
-## Setup
+## Implementations
 
-```bash
-pip install -r requirements.txt
-ollama pull llama3
-```
-
-## Usage
-
-```bash
-python main.py
-```
-
-Ask questions about `company_policy.txt`. Type `q` to quit.
-
-## Customization
-
-Replace `company_policy.txt` with any text file. Adjust `chunk_size`, `chunk_overlap`, and `k` to tune retrieval quality.
+| Language | Folder |
+|---|---|
+| Python | [python/](python/) |

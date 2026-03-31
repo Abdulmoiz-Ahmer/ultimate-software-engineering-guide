@@ -31,9 +31,8 @@ Append turn to chat history
 - **Two-prompt architecture** -- the pipeline uses two separate prompts:
   - **Rephraser prompt** -- rewrites follow-up questions into self-contained queries using chat history. The retriever always gets a clear, context-free query.
   - **QA prompt** -- answers the rephrased question using only the retrieved document chunks.
-- **`create_history_aware_retriever`** -- wraps the base retriever with the rephraser prompt. The LLM rewrites the query first, then the standalone query is used for vector search.
-- **`MessagesPlaceholder`** -- injects the chat history list into the prompt template at runtime.
-- **Rolling memory** -- after each turn, `HumanMessage` and `AIMessage` are appended to `chat_history` and passed into the next `invoke()` call.
+- **History-aware retriever** -- wraps the base retriever with the rephraser prompt. The LLM rewrites the query first, then the standalone query is used for vector search.
+- **Rolling memory** -- after each turn, user and assistant messages are appended to the chat history and passed into the next call.
 
 ## Comparison with basic RAG pipeline
 
@@ -42,33 +41,14 @@ Append turn to chat history
 | Follow-up questions | Fail (no context) | Resolved via rephrasing |
 | Prompts | 1 (QA only) | 2 (rephraser + QA) |
 | Retriever | Base retriever | History-aware retriever |
-| Chat history | None | Rolling `HumanMessage`/`AIMessage` list |
+| Chat history | None | Rolling message list |
 
 ## Prerequisites
 
-- Python 3.10+
 - [Ollama](https://ollama.com/) running locally with `llama3` pulled
 
-## Setup
+## Implementations
 
-```bash
-pip install -r requirements.txt
-ollama pull llama3
-```
-
-## Usage
-
-```bash
-python main.py
-```
-
-Try a multi-turn conversation:
-- `Who is the IT lead?`
-- `What is her extension?` (resolved using chat history)
-- `When is the cafeteria open?`
-
-Type `q` to quit.
-
-## Customization
-
-Replace `company_policy.txt` with any text file. Adjust `chunk_size`, `chunk_overlap`, and `k` to tune retrieval quality.
+| Language | Folder |
+|---|---|
+| Python | [python/](python/) |
