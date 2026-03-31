@@ -2,11 +2,25 @@
 
 This module covers the fundamentals of working with LLMs: making API calls, prompt engineering, system instructions, safety guardrails, and running models locally. Each project builds on the previous one.
 
+## Project structure
+
+Each project folder contains a language-agnostic README explaining the concept, with implementation-specific code and instructions inside language subfolders:
+
+```
+project-name/
+  README.md          # What it does, key concepts, prerequisites
+  python/            # Python implementation + setup instructions
+    main.py
+    requirements.txt
+    README.md
+  # js/              # (coming soon)
+```
+
 ## Learning path
 
 ### 1. [Gemini Chat CLI](gemini-chat-cli/)
 
-Your first LLM app -- a minimal terminal chatbot powered by Gemini 2.5 Flash. Covers API key setup, the `google-genai` SDK, and how chat sessions preserve context across messages.
+Your first LLM app -- a minimal terminal chatbot powered by Gemini 2.5 Flash. Covers API key setup, chat sessions, and how conversation memory works.
 
 **You learn:** How to connect to an LLM API, send messages, and maintain conversation history.
 
@@ -48,4 +62,4 @@ Rebuilds the tone rewriter using Llama 3 running locally via Ollama. Same prompt
 - A Gemini API key (projects 1-3) -- get one from [Google AI Studio](https://aistudio.google.com/)
 - [Ollama](https://ollama.com/) with `llama3` pulled (project 4 only)
 
-Each project has its own `README.md` and `requirements.txt` with setup instructions.
+Each project has its own `README.md` with concept explanations, and each language folder has setup instructions.

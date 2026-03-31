@@ -12,8 +12,7 @@ This is the local/offline counterpart to the Gemini-based [professional-tone-rew
 
 ## Key concepts
 
-- **System role message** -- the Ollama chat API accepts a `"role": "system"` message that acts like a system instruction, defining the model's persona and rules.
-- **`ollama.chat`** -- sends a list of messages to a locally running model and returns a response dict. The rewritten text is in `response["message"]["content"]`.
+- **System role message** -- the Ollama chat API accepts a system message that acts like a system instruction, defining the model's persona and rules.
 - **Fully local** -- no API keys, no network calls, no data leaves your machine.
 
 ## Comparison with Gemini version
@@ -27,23 +26,14 @@ This is the local/offline counterpart to the Gemini-based [professional-tone-rew
 
 ## Prerequisites
 
-- Python 3.10+
 - [Ollama](https://ollama.com/) installed and running
 - Llama 3 model pulled:
   ```bash
   ollama pull llama3
   ```
 
-## Setup
+## Implementations
 
-```bash
-pip install -r requirements.txt
-```
-
-## Usage
-
-```bash
-python main.py
-```
-
-Paste your text and get a professional rewrite. Type `q` to quit.
+| Language | Folder |
+|---|---|
+| Python | [python/](python/) |

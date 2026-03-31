@@ -10,32 +10,16 @@ A minimal terminal chatbot powered by Google's **Gemini 2.5 Flash** model. This 
 
 ## Key concepts
 
-- **`genai.Client`** -- authenticates with the Gemini API using your key.
-- **`client.chats.create`** -- creates a stateful chat session that accumulates message history.
-- **`chat.send_message`** -- sends user input and returns the model's response. History is appended internally.
+- **API client** -- authenticates with the Gemini API using your key.
+- **Chat session** -- a stateful session that accumulates message history across turns.
+- **Conversation memory** -- the model remembers what was said earlier because the session appends every exchange internally.
 
 ## Prerequisites
 
-- Python 3.10+
 - A Gemini API key (get one from [Google AI Studio](https://aistudio.google.com/))
 
-## Setup
+## Implementations
 
-```bash
-pip install -r requirements.txt
-```
-
-Copy `example.env` to `.env` and add your API key:
-
-```bash
-cp example.env .env
-# Edit .env and set GEMINI_API_KEY=your_key_here
-```
-
-## Usage
-
-```bash
-python main.py
-```
-
-Type messages and the bot responds. Type `q` to quit.
+| Language | Folder |
+|---|---|
+| Python | [python/](python/) |
