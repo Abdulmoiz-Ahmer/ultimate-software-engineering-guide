@@ -1,6 +1,6 @@
 # 03 -- Industry Frameworks
 
-This module rebuilds the RAG pipeline from module 02 using **LangChain** -- the most widely used framework for building LLM applications. Each project adds one new capability on top of the previous one, showing how LangChain's composable abstractions simplify real-world AI pipelines.
+This module rebuilds the RAG pipeline from module 02 using industry-standard frameworks -- **LangChain** and **LlamaIndex**. The LangChain projects add capabilities progressively, and the final project shows the same pipeline in LlamaIndex for comparison.
 
 ## Learning path
 
@@ -31,6 +31,16 @@ Swaps `TextLoader` for `PyPDFLoader` so the chatbot can ingest PDF documents. Ev
 **You learn:** How to work with PDF documents in a RAG pipeline and how LangChain's loader abstraction decouples document format from pipeline logic.
 
 **Key concepts:** PyPDFLoader, page-by-page extraction, loader abstraction
+
+---
+
+### 4. [LlamaIndex PDF RAG](llamaindex-pdf-rag/python/)
+
+The same PDF RAG concept rebuilt with **LlamaIndex** -- a different framework with a more declarative, batteries-included philosophy. The entire pipeline (load, chunk, embed, store, query) is set up in under 10 lines of code, compared to the explicit step-by-step approach in LangChain.
+
+**You learn:** How LlamaIndex compares to LangChain, global configuration via Settings, and how VectorStoreIndex bundles chunking + embedding + storage into a single call.
+
+**Key concepts:** LlamaIndex Settings, SimpleDirectoryReader, VectorStoreIndex, query engine, BGE embeddings
 
 ## Prerequisites
 
