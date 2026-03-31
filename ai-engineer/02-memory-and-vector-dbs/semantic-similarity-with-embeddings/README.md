@@ -28,22 +28,14 @@ Target: 'Batman is a fictional character.'
 
 - **Text embeddings** -- a pre-trained model converts sentences into fixed-size numerical vectors. Sentences with similar meaning get vectors that point in similar directions.
 - **Cosine similarity** -- measures the angle between two vectors. 1.0 = same direction (identical meaning), 0.0 = perpendicular (unrelated). Two sentences can score high even with no shared words.
-- **`SentenceTransformer`** -- the `sentence-transformers` library provides pre-trained models optimized for embedding sentences. `all-MiniLM-L6-v2` is lightweight and general-purpose.
 - **Why this matters** -- vector search (used in RAG and vector databases) relies on this exact process: encode a query, then find the stored embeddings closest to it.
 
 ## Prerequisites
 
-- Python 3.10+
 - No API keys needed -- the model runs locally (downloaded on first run)
 
-## Setup
+## Implementations
 
-```bash
-pip install -r requirements.txt
-```
-
-## Usage
-
-```bash
-python main.py
-```
+| Language | Folder |
+|---|---|
+| Python | [python/](python/) |

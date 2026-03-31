@@ -2,6 +2,20 @@
 
 This module covers how LLMs can work with long-term memory using embeddings and vector databases. You will learn how text is converted into numerical representations, how similarity search works under the hood, and how to build a full RAG pipeline.
 
+## Project structure
+
+Each project folder contains a language-agnostic README explaining the concept, with implementation-specific code and instructions inside language subfolders:
+
+```
+project-name/
+  README.md          # What it does, key concepts, prerequisites
+  python/            # Python implementation + setup instructions
+    main.py
+    requirements.txt
+    README.md
+  # js/              # (coming soon)
+```
+
 ## Learning path
 
 ### 1. [Semantic Similarity with Embeddings](semantic-similarity-with-embeddings/)
@@ -38,4 +52,4 @@ The culmination of this module. A document is chunked, embedded, and stored in C
 - [Ollama](https://ollama.com/) with `llama3` pulled (project 3 only)
 - No API keys needed -- all projects run locally
 
-Each project has its own `README.md` and `requirements.txt` with setup instructions.
+Each project has its own `README.md` with concept explanations, and each language folder has setup instructions.

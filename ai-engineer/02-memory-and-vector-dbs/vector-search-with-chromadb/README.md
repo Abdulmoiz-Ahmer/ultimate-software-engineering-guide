@@ -23,25 +23,16 @@ Top results:
 
 - **Vector database** -- stores documents as numerical vectors (embeddings) and supports nearest-neighbor search. ChromaDB handles embedding automatically using its built-in model.
 - **Collection** -- ChromaDB's equivalent of a database table. Stores documents, embeddings, and optional metadata.
-- **PersistentClient** -- saves data to disk (`./chroma_db`) so it survives between runs, unlike an in-memory client.
+- **Persistent storage** -- saves data to disk so it survives between runs, unlike an in-memory store.
 - **Distance score** -- measures how far apart two embeddings are. Lower distance = higher semantic similarity. This is the inverse of the cosine similarity from the previous project.
 - **Why this matters** -- vector search is the retrieval step in RAG (Retrieval-Augmented Generation). You store your knowledge base as embeddings, then find the most relevant chunks for a given query.
 
 ## Prerequisites
 
-- Python 3.10+
 - No API keys needed -- runs fully offline
 
-## Setup
+## Implementations
 
-```bash
-pip install -r requirements.txt
-```
-
-## Usage
-
-```bash
-python main.py
-```
-
-Type any concept or phrase to search. Results show the top 3 matches with distance scores. Type `q` to quit.
+| Language | Folder |
+|---|---|
+| Python | [python/](python/) |

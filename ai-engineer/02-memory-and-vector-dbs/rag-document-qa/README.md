@@ -27,7 +27,7 @@ Generate: Llama 3 answers using only the provided context
 - **RAG (Retrieval-Augmented Generation)** -- instead of relying on the model's training data, RAG retrieves relevant context at query time and feeds it to the model. This reduces hallucination and lets the model answer from up-to-date or private documents.
 - **Chunking with overlap** -- the document is split into fixed-size chunks with overlap so that sentences spanning a boundary are captured in at least one chunk.
 - **Grounding prompt** -- the system instruction tells the model to answer only from the provided context. If the answer isn't there, it says so rather than guessing.
-- **Persistent vector storage** -- ChromaDB saves embeddings to disk (`./rag_db`) so they survive between runs.
+- **Persistent vector storage** -- embeddings are saved to disk so they survive between runs.
 
 ## Sample data
 
@@ -35,30 +35,10 @@ The included `company_policy.txt` contains a short company policy document. Repl
 
 ## Prerequisites
 
-- Python 3.10+
 - [Ollama](https://ollama.com/) running locally with the `llama3` model pulled
 
-## Setup
+## Implementations
 
-```bash
-pip install -r requirements.txt
-ollama pull llama3
-```
-
-## Usage
-
-```bash
-python main.py
-```
-
-Ask questions about the document. Type `q` to quit.
-
-Example queries:
-- `What is the Wi-Fi password?`
-- `How many PTO days do employees get?`
-- `Who should I contact if the server crashes?`
-
-## Customization
-
-- Replace `company_policy.txt` with any text file.
-- Adjust `chunk_size` and `overlap` in `get_chunks()` to tune retrieval granularity.
+| Language | Folder |
+|---|---|
+| Python | [python/](python/) |
