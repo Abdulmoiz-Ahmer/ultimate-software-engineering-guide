@@ -1,6 +1,6 @@
 # AI Engineer -- Learning Path
 
-A hands-on, project-based curriculum for learning AI engineering from the ground up. Each module builds on the previous one, progressing from basic LLM API calls to multimodal pipelines and autonomous agents.
+A hands-on, project-based curriculum for learning AI engineering from the ground up. Each module builds on the previous one, progressing from basic LLM API calls to fine-tuning your own models.
 
 ## Modules
 
@@ -44,17 +44,29 @@ Working with inputs beyond text -- images and audio -- by chaining specialized m
 
 ---
 
-### 06 -- Agentic AI and Orchestration *(coming soon)*
+### [06 -- Agentic AI and Orchestration](06-agentic-ai-and-orchestration/)
 
-Multi-agent systems with CrewAI and stateful agents with LangGraph.
+Multi-agent systems with CrewAI (sequential and hierarchical) and custom graph-based agent loops with LangGraph.
 
-### 07 -- Advanced RAG *(coming soon)*
+3 projects: CrewAI research team, hierarchical multi-agent, LangGraph stateful agent
 
-Hybrid search, query transformation (HyDE), and reranking with Cohere.
+---
 
-### 08 -- Model Finetuning *(coming soon)*
+### [07 -- Advanced RAG](07-advanced-rag/)
 
-Dataset preparation and QLoRA instruction tuning with HuggingFace.
+Techniques that improve retrieval quality beyond basic vector search -- query transformation, hybrid search, and reranking.
+
+3 projects: HyDE query transform, hybrid search pipeline, Cohere reranking
+
+---
+
+### [08 -- Model Finetuning](08-model-finetuning/)
+
+Customizing a language model's behavior by preparing training data and fine-tuning with LoRA adapters.
+
+2 projects: HuggingFace dataset prep, QLoRA instruction tuning
+
+---
 
 ### 09 -- LLMOps and Evaluation *(coming soon)*
 
@@ -70,7 +82,7 @@ Streamlit chatbot UI, FastAPI LLM service, and Docker deployment.
 
 ## Project structure
 
-Modules 01-03 follow a multi-language structure. Modules 04-05 are Python-only (refactoring pending).
+Each project folder contains a language-agnostic README explaining the concept, with implementation-specific code and instructions inside language subfolders:
 
 ```
 module-name/
@@ -89,3 +101,6 @@ module-name/
 - Python 3.10+
 - [Ollama](https://ollama.com/) with `llama3` pulled (most projects)
 - A Gemini API key for module 01 projects 1-3 (get one from [Google AI Studio](https://aistudio.google.com/))
+- A [Tavily](https://tavily.com/) API key (module 04, projects 2-3)
+- A [Cohere](https://cohere.com/) API key (module 07, project 3)
+- A GPU is recommended for module 08 (LoRA fine-tuning)
