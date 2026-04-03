@@ -1,0 +1,8 @@
+langchain-core
+langchain-classic
+langchain-huggingface
+langchain-chroma
+langchain-cohere
+sentence-transformers
+chromadb
+python-dotenv
