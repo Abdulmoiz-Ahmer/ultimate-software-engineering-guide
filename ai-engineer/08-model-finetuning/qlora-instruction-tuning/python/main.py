@@ -26,9 +26,9 @@ import logging
 
 import torch
 from datasets import load_from_disk
-from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments
+from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import LoraConfig, get_peft_model
-from trl import SFTTrainer
+from trl import SFTTrainer, SFTConfig 
 
 # Suppress verbose transformer warnings during training.
 logging.getLogger("transformers").setLevel(logging.ERROR)
@@ -114,22 +114,22 @@ model.print_trainable_parameters()
 
 print("Configuring trainer...")
 
-training_args = TrainingArguments(
+training_args = SFTConfig(
     output_dir="./results",
-    per_device_train_batch_size=1,
+    per_device_train_batch_size=1, 
     gradient_accumulation_steps=4,
     learning_rate=2e-4,
     logging_steps=1,
-    max_steps=20,
-    fp16=True,
+    max_steps=20, 
+    fp16=True, 
     optim="paged_adamw_8bit",
+    dataset_text_field="text", 
+    max_length=512      
 )
 
 trainer = SFTTrainer(
-    model=model,
+  model=model,
     train_dataset=dataset,
-    dataset_text_field="text",
-    max_seq_length=512,
     args=training_args,
 )
 
