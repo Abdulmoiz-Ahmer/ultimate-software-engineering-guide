@@ -68,9 +68,13 @@ Customizing a language model's behavior by preparing training data and fine-tuni
 
 ---
 
-### 09 -- LLMOps and Evaluation *(coming soon)*
+### [09 -- LLMOps and Evaluation](09-llmops-and-evaluation/)
 
-Tracing with LangSmith and automated evaluation with RAGAS.
+Observability with LangSmith tracing and automated RAG evaluation with RAGAS.
+
+2 projects: LangSmith tracing, RAGAS automated evaluation
+
+---
 
 ### 10 -- MCP and Tool Infrastructure *(coming soon)*
 
@@ -104,3 +108,4 @@ module-name/
 - A [Tavily](https://tavily.com/) API key (module 04, projects 2-3)
 - A [Cohere](https://cohere.com/) API key (module 07, project 3)
 - A GPU is recommended for module 08 (LoRA fine-tuning)
+- A [LangSmith](https://smith.langchain.com/) API key (module 09, project 1, free tier available)
