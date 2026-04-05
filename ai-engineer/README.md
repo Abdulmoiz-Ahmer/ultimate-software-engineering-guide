@@ -76,9 +76,13 @@ Observability with LangSmith tracing and automated RAG evaluation with RAGAS.
 
 ---
 
-### 10 -- MCP and Tool Infrastructure *(coming soon)*
+### [10 -- MCP and Tool Infrastructure](10-mcp-and-tool-infrastructure/)
 
-Building and connecting custom MCP servers.
+Building custom MCP servers that expose tools, and connecting them to LLM agents via the Model Context Protocol.
+
+2 projects: Custom MCP server, MCP client connection
+
+---
 
 ### 11 -- UI and Deployment *(coming soon)*
 
