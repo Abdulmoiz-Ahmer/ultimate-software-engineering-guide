@@ -1,6 +1,6 @@
 # AI Engineer -- Learning Path
 
-A hands-on, project-based curriculum for learning AI engineering from the ground up. Each module builds on the previous one, progressing from basic LLM API calls to fine-tuning your own models.
+A hands-on, project-based curriculum for learning AI engineering from the ground up. 11 modules, 30+ projects, progressing from basic LLM API calls to deploying a full-stack AI application.
 
 ## Modules
 
@@ -84,9 +84,11 @@ Building custom MCP servers that expose tools, and connecting them to LLM agents
 
 ---
 
-### 11 -- UI and Deployment *(coming soon)*
+### [11 -- UI and Deployment](11-ui-and-deployment/)
 
-Streamlit chatbot UI, FastAPI LLM service, and Docker deployment.
+Serving an LLM through a REST API with FastAPI and building a browser-based chat UI with Streamlit.
+
+2 projects: FastAPI LLM service, Streamlit chatbot UI
 
 ## Project structure
 
