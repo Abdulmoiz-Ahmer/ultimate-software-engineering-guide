@@ -27,6 +27,11 @@ Top results:
 - **Distance score** -- measures how far apart two embeddings are. Lower distance = higher semantic similarity. This is the inverse of the cosine similarity from the previous project.
 - **Why this matters** -- vector search is the retrieval step in RAG (Retrieval-Augmented Generation). You store your knowledge base as embeddings, then find the most relevant chunks for a given query.
 
+## Resources
+
+- [Vector Similarity Explained](https://www.pinecone.io/learn/vector-similarity/) -- deep dive into cosine similarity, euclidean distance, and dot product -- helps understand the distance metrics vector databases use under the hood
+- [Cosine Similarity (video)](https://youtu.be/e9U0QAFbfLI) -- visual walkthrough of cosine similarity, the inverse of the distance score ChromaDB returns
+
 ## Prerequisites
 
 - No API keys needed -- runs fully offline

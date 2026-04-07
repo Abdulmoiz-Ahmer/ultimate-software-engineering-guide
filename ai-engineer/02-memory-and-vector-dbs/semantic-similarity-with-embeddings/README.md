@@ -30,6 +30,11 @@ Target: 'Batman is a fictional character.'
 - **Cosine similarity** -- measures the angle between two vectors. 1.0 = same direction (identical meaning), 0.0 = perpendicular (unrelated). Two sentences can score high even with no shared words.
 - **Why this matters** -- vector search (used in RAG and vector databases) relies on this exact process: encode a query, then find the stored embeddings closest to it.
 
+## Resources
+
+- [Vector Similarity Explained](https://www.pinecone.io/learn/vector-similarity/) -- covers cosine similarity, euclidean distance, and dot product with visual explanations of when to use each
+- [Cosine Similarity (video)](https://youtu.be/e9U0QAFbfLI) -- visual walkthrough of how cosine similarity works
+
 ## Prerequisites
 
 - No API keys needed -- the model runs locally (downloaded on first run)
