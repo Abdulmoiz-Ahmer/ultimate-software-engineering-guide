@@ -23,3 +23,4 @@ A minimal terminal chatbot powered by Google's **Gemini 2.5 Flash** model. This 
 | Language | Folder |
 |---|---|
 | Python | [python/](python/) |
+| JavaScript | [js/](js/) |
