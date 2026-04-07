@@ -72,21 +72,21 @@ Curated learning guides and projects for the JavaScript ecosystem.
 
 ### [AI Engineer](ai-engineer/)
 
-A project-based curriculum for learning AI engineering, from LLM API calls to autonomous agents.
+A hands-on, project-based curriculum (11 modules, 30+ projects) progressing from basic LLM API calls to deploying full-stack AI applications.
 
-| # | Module | Status |
-|---|--------|--------|
-| 01 | [Foundations and Prompting](ai-engineer/01-foundations-and-prompting/) | Done |
-| 02 | [Memory and Vector Databases](ai-engineer/02-memory-and-vector-dbs/) | Done |
-| 03 | [Industry Frameworks](ai-engineer/03-industry-frameworks/) | Done |
-| 04 | [Agents and Tools](ai-engineer/04-agents-and-tools/) | Done |
-| 05 | [Multimodal AI](ai-engineer/05-multimodal-ai/) | Done |
-| 06 | Agentic AI and Orchestration | Coming soon |
-| 07 | Advanced RAG | Coming soon |
-| 08 | Model Finetuning | Coming soon |
-| 09 | LLMOps and Evaluation | Coming soon |
-| 10 | MCP and Tool Infrastructure | Coming soon |
-| 11 | UI and Deployment | Coming soon |
+| # | Module | Projects |
+|---|--------|----------|
+| 01 | [Foundations and Prompting](ai-engineer/01-foundations-and-prompting/) | Gemini chatbot, tone rewriter, content safety guardrail, local Ollama rewriter |
+| 02 | [Memory and Vector Databases](ai-engineer/02-memory-and-vector-dbs/) | Semantic similarity, ChromaDB vector search, RAG document Q&A |
+| 03 | [Industry Frameworks](ai-engineer/03-industry-frameworks/) | LangChain RAG, RAG with memory, PDF RAG, LlamaIndex PDF RAG |
+| 04 | [Agents and Tools](ai-engineer/04-agents-and-tools/) | Manual tool-calling agent, web search agent, CSV data analyst agent |
+| 05 | [Multimodal AI](ai-engineer/05-multimodal-ai/) | Vision model image analysis, speech-to-summary |
+| 06 | [Agentic AI and Orchestration](ai-engineer/06-agentic-ai-and-orchestration/) | CrewAI research team, hierarchical multi-agent, LangGraph stateful agent |
+| 07 | [Advanced RAG](ai-engineer/07-advanced-rag/) | HyDE query transform, hybrid search pipeline, Cohere reranking |
+| 08 | [Model Finetuning](ai-engineer/08-model-finetuning/) | HuggingFace dataset prep, QLoRA instruction tuning |
+| 09 | [LLMOps and Evaluation](ai-engineer/09-llmops-and-evaluation/) | LangSmith tracing, RAGAS automated evaluation |
+| 10 | [MCP and Tool Infrastructure](ai-engineer/10-mcp-and-tool-infrastructure/) | Custom MCP server, MCP client connection |
+| 11 | [UI and Deployment](ai-engineer/11-ui-and-deployment/) | FastAPI LLM service, Streamlit chatbot UI |
 
 ---
 
@@ -96,6 +96,10 @@ A project-based curriculum for learning AI engineering, from LLM API calls to au
 - **Python 3.10+** -- For AI engineer modules and algorithm solutions
 - **Ollama** -- With `llama3` pulled (AI engineer modules)
 - **Gemini API key** -- For AI engineer module 01 ([Google AI Studio](https://aistudio.google.com/))
+- **Tavily API key** -- For AI engineer module 04, projects 2-3 ([tavily.com](https://tavily.com/))
+- **Cohere API key** -- For AI engineer module 07, project 3 ([cohere.com](https://cohere.com/))
+- **LangSmith API key** -- For AI engineer module 09 ([smith.langchain.com](https://smith.langchain.com/), free tier available)
+- **GPU recommended** -- For AI engineer module 08 (LoRA fine-tuning)
 
 ## License
 
