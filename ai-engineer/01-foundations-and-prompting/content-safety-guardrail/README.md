@@ -28,3 +28,4 @@ User input -> Moderation model (pass/block) -> Chat model -> Response
 | Language | Folder |
 |---|---|
 | Python | [python/](python/) |
+| JavaScript | [js/](js/) |
