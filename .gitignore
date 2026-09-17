@@ -73,7 +73,6 @@ logs/*.txt
 *.log
 
 # Model cache and downloads
-models/
 *.pt
 *.pth
 *.bin
