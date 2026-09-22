@@ -1,0 +1,42 @@
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# SQLite database files
+*.db
+*.sqlite
+*.sqlite3
+todos.db
+
+# Override rules to prevent skipping application models across modules
+!app/modules/**/models.py
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+
+# IDE & Editor configuration
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Testing & code quality caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
