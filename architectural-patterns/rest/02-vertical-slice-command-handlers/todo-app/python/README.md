@@ -2,146 +2,383 @@
 
 A RESTful Todo API built with FastAPI demonstrating the **Unidirectional Component Architecture** pattern with **CQRS (Command Query Responsibility Segregation)**. This project showcases vertical feature slicing, component isolation, and unidirectional data flow.
 
-## 🏗️ Architecture Overview
+## 📋 Table of Contents
 
-This application implements a **Unidirectional Component Architecture** where each component is a self-contained vertical slice of functionality:
+- [What is Unidirectional Component Architecture?](#-what-is-unidirectional-component-architecture)
+- [Pros and Cons](#-pros-and-cons)
+- [When to Use This Architecture](#-when-to-use-this-architecture)
+- [Technology Stack](#-technology-stack)
+- [Getting Started](#-getting-started)
+- [Project Structure](#-project-structure)
+- [How It Works](#-how-it-works)
+- [API Endpoints](#-api-endpoints)
+- [Design Patterns](#-design-patterns)
+- [Best Practices](#-best-practices)
+- [Database Migrations](#-database-migrations)
+- [Contributing](#-contributing)
+
+---
+
+## 🏛️ What is Unidirectional Component Architecture?
+
+**Unidirectional Component Architecture** (also known as **Vertical Slice Architecture** or **Feature-Based Architecture**) is an alternative to traditional layered architecture that organizes code by business features rather than technical layers.
+
+### Core Principle
+
+Instead of spreading a single feature across multiple technical layers (controllers, services, repositories), **all code related to a feature lives together** in a self-contained component with **unidirectional data flow**.
+
+### Visual Comparison
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Application Core                          │
-│                   (app/core/)                                │
-│          Shared Infrastructure & Configuration               │
-│              - Database configuration                        │
-│              - Shared utilities                              │
-└─────────────────────────────────────────────────────────────┘
-                            ↓
-┌─────────────────────────────────────────────────────────────┐
-│                 Todo Component (Vertical Slice)              │
-│                   (app/components/todos/)                    │
-├─────────────────────────────────────────────────────────────┤
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │  Router (router.py)                                  │   │
-│  │  - HTTP endpoints                                    │   │
-│  │  - Request/response mapping                          │   │
-│  └─────────────────────────────────────────────────────┘   │
-│                          ↓                                   │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │  Handlers (handlers.py) - CQRS Pattern              │   │
-│  │  - Commands (CreateTodoHandler, UpdateTodoHandler)   │   │
-│  │  - Queries (GetTodoQuery, ListTodosQuery)           │   │
-│  └─────────────────────────────────────────────────────┘   │
-│                          ↓                                   │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │  Schemas (schemas.py)                                │   │
-│  │  - Commands (CreateTodoCommand, UpdateTodoCommand)   │   │
-│  │  - DTOs (TodoDTO)                                    │   │
-│  └─────────────────────────────────────────────────────┘   │
-│                          ↓                                   │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │  Model (models.py)                                   │   │
-│  │  - TodoModel (ORM)                                   │   │
-│  └─────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+Traditional Layered:              Unidirectional Component:
+├── controllers/                  ├── components/
+│   ├── todo_controller.py        │   ├── todos/              ← Feature 1
+│   └── user_controller.py        │   │   ├── router.py       │  (Everything
+├── services/                     │   │   ├── handlers.py     │   for todos
+│   ├── todo_service.py           │   │   ├── schemas.py      │   in one
+│   └── user_service.py           │   │   └── models.py       │   place)
+├── repositories/                 │   │
+│   ├── todo_repository.py        │   └── users/              ← Feature 2
+│   └── user_repository.py        │       ├── router.py       │  (Everything
+└── models/                       │       ├── handlers.py     │   for users
+    ├── todo.py                   │       ├── schemas.py      │   in one
+    └── user.py                   │       └── models.py       │   place)
+                                  │
+(Feature scattered               └── core/                   ← Shared only
+ across 4+ directories)              └── database.py         │  (Infrastructure)
+```
+
+### Architecture Diagram
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                     Application Core                          │
+│           (Shared Infrastructure & Utilities)                 │
+│   - Database configuration                                    │
+│   - Common middleware                                         │
+│   - Cross-cutting concerns (logging, auth, etc.)             │
+└──────────────────────────────────────────────────────────────┘
+                    ↓                    ↓
+┌─────────────────────────┐    ┌─────────────────────────┐
+│  Todo Component         │    │  User Component         │
+│  (Vertical Slice)       │    │  (Vertical Slice)       │
+├─────────────────────────┤    ├─────────────────────────┤
+│  ├── router.py          │    │  ├── router.py          │
+│  ├── handlers.py        │    │  ├── handlers.py        │
+│  ├── schemas.py         │    │  ├── schemas.py         │
+│  └── models.py          │    │  └── models.py          │
+│                         │    │                         │
+│  Self-contained         │    │  Self-contained         │
+│  No cross-dependencies  │    │  No cross-dependencies  │
+└─────────────────────────┘    └─────────────────────────┘
 ```
 
 ### Unidirectional Data Flow
 
-```
-HTTP Request → Router → Handler/Query → Model → Database
-                 ↓
-HTTP Response ← DTO ← Handler/Query ← Model ← Database
-```
-
-## 🎯 Key Architectural Concepts
-
-### 1. **Component-Based Organization (Vertical Slices)**
-
-Instead of organizing code by technical layers (controllers, services, repositories), code is organized by **features/components**:
-
-```
-Traditional Layered:           Unidirectional Component:
-├── controllers/               ├── components/
-│   └── todo_controller.py     │   └── todos/              ← Self-contained
-├── services/                  │       ├── router.py       ← Routes
-│   └── todo_service.py        │       ├── handlers.py     ← Business logic
-├── repositories/              │       ├── schemas.py      ← DTOs/Commands
-│   └── todo_repository.py     │       └── models.py       ← ORM models
-└── models/                    └── core/                   ← Shared
-    └── todo.py                    └── database.py         ← Infrastructure
-```
-
-**Benefits:**
-- ✅ All related code lives together
-- ✅ Easy to understand a feature by looking at one folder
-- ✅ Components can be added/removed independently
-- ✅ Reduces coupling between features
-- ✅ Teams can own specific components
-
-### 2. **CQRS Pattern (Command Query Responsibility Segregation)**
-
-Separates read operations (Queries) from write operations (Commands):
+Data flows in **one direction** through each component:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                       CQRS Pattern                           │
-├─────────────────────────────────────────────────────────────┤
-│  Commands (Writes)          |    Queries (Reads)            │
-│  ─────────────────          |    ───────────────            │
-│  • CreateTodoHandler        |    • GetTodoQuery             │
-│  • UpdateTodoHandler        |    • ListTodosQuery           │
-│  • DeleteTodoHandler        |                               │
-│  ─────────────────          |    ───────────────            │
-│  • Modify state             |    • Read state only          │
-│  • Return updated data      |    • Never modify             │
-│  • Validation heavy         |    • Optimized for speed      │
-│  • Can be async/queued      |    • Can be cached            │
+│                    WRITE FLOW (Command)                      │
 └─────────────────────────────────────────────────────────────┘
+
+HTTP POST Request
+    ↓
+Router (validates input → CreateTodoCommand)
+    ↓
+Handler (business logic → creates TodoModel)
+    ↓
+Model (ORM saves to database)
+    ↓
+Database (persists data)
+    ↓
+Model (returns saved TodoModel)
+    ↓
+Handler (converts to TodoDTO)
+    ↓
+Router (returns HTTP response)
+    ↓
+HTTP Response with TodoDTO
+
+
+┌─────────────────────────────────────────────────────────────┐
+│                     READ FLOW (Query)                        │
+└─────────────────────────────────────────────────────────────┘
+
+HTTP GET Request
+    ↓
+Router (validates query params)
+    ↓
+Query Handler (fetches data)
+    ↓
+Model (reads from database)
+    ↓
+Database (returns data)
+    ↓
+Query Handler (converts to TodoDTO)
+    ↓
+Router (returns HTTP response)
+    ↓
+HTTP Response with TodoDTO
 ```
 
-**Benefits:**
-- ✅ Clear separation of reads and writes
-- ✅ Optimize queries and commands independently
-- ✅ Different validation rules for each
-- ✅ Easier to scale (separate read/write databases if needed)
+**Key Principle**: Each layer only depends on the layer directly below it. No backwards dependencies, no circular references.
 
-### 3. **Handler Pattern (Single Responsibility)**
+---
 
-Each operation has its own handler class with a single `execute()` method:
+## ⚖️ Pros and Cons
 
-- **CreateTodoHandler** - Creates new todos
-- **GetTodoQuery** - Fetches a single todo
-- **ListTodosQuery** - Lists todos with pagination
-- **UpdateTodoHandler** - Updates existing todos
-- **DeleteTodoHandler** - Deletes todos
+### ✅ Advantages
 
-**Benefits:**
-- ✅ One class = one responsibility
-- ✅ Easy to test in isolation
-- ✅ Easy to understand and modify
-- ✅ Reusable across different contexts
+#### 1. High Feature Cohesion
 
-### 4. **Data Transfer Objects (DTOs) and Commands**
+- All code for a feature lives in one folder
+- Easy to find everything related to a specific feature
+- Complete understanding by looking at one component
+- No need to jump between 3+ directories
 
-- **Commands** (Input): `CreateTodoCommand`, `UpdateTodoCommand` - Represent user intent
-- **DTOs** (Output): `TodoDTO` - Immutable data for responses
+#### 2. Loose Coupling Between Features
 
-**Benefits:**
-- ✅ Clear API contracts
-- ✅ Separate internal models from external API
-- ✅ Type-safe validation via Pydantic
-- ✅ Consistent response format
+- Components don't depend on each other
+- Changes to one component don't affect others
+- Can add/remove features without side effects
+- Easy to refactor individual components
 
-## ✨ Key Features
+#### 3. Team Scalability
 
-- ✅ **Vertical Slice Architecture**: Features organized by domain, not technology
-- ✅ **CQRS Pattern**: Separated read and write operations
-- ✅ **Unidirectional Flow**: Predictable data flow from router to database
-- ✅ **Component Isolation**: Each component is self-contained
-- ✅ **Handler Pattern**: Single-responsibility command/query handlers
-- ✅ **Type Safety**: Full type hints with Pydantic validation
-- ✅ **UUID Primary Keys**: Globally unique identifiers
-- ✅ **RESTful API**: Standard HTTP methods and status codes
-- ✅ **Auto-generated Docs**: Interactive API documentation
+- Teams can own entire features/components
+- Parallel development without conflicts
+- Less coordination overhead between teams
+- Clear boundaries and ownership
+
+#### 4. Microservices-Ready
+
+- Each component is already isolated
+- Clear boundaries make extraction straightforward
+- Can move components to separate services independently
+- Perfect for gradual microservices migration
+
+#### 5. Better for Domain-Driven Design
+
+- Aligns with bounded contexts
+- Rich domain models with behavior
+- Business logic stays with the domain
+- Natural fit for aggregate roots
+
+#### 6. Reduced Merge Conflicts
+
+- Teams work in separate component folders
+- No shared service layer to conflict over
+- Cleaner Git history per feature
+- Faster code reviews
+
+#### 7. Faster Feature Development
+
+- Add new features by creating new components
+- No need to modify existing layers
+- Clear template to follow
+- Reduced cognitive load
+
+#### 8. Independent Evolution
+
+- Features can evolve at their own pace
+- Different patterns per component if needed
+- Easy to experiment with one feature
+- No forced consistency across all features
+
+### ❌ Disadvantages
+
+#### 1. Code Duplication
+
+- Similar logic may exist in multiple components
+- No shared service layer to reuse code
+- Need to extract common code to core carefully
+- Can lead to inconsistencies if not managed
+
+#### 2. More Boilerplate
+
+- Each component needs router, handler, schema, model
+- More files to create for simple features
+- Can feel like over-engineering for CRUD operations
+- Initial setup is heavier
+
+#### 3. Shared Business Logic Challenges
+
+- Hard to implement cross-feature business rules
+- No natural place for shared domain logic
+- May need to introduce events or domain services
+- Can lead to duplicated validation
+
+#### 4. Learning Curve
+
+- Less familiar than traditional layered architecture
+- Team needs to understand vertical slicing
+- Requires discipline to maintain boundaries
+- Harder for junior developers initially
+
+#### 5. Potential for Inconsistency
+
+- Different components may use different patterns
+- Without guidelines, each team may do things differently
+- Code reviews need to catch architectural drift
+- Requires strong architectural governance
+
+#### 6. Overkill for Small Applications
+
+- Too much structure for simple CRUD apps
+- More folders and files to navigate
+- Added complexity without benefits
+- Traditional layering is simpler for small projects
+
+#### 7. Cross-Component Queries
+
+- Harder to implement features spanning multiple components
+- May need to call multiple handlers
+- Can lead to N+1 query problems
+- Need event-driven patterns for complex workflows
+
+#### 8. Testing Challenges
+
+- Integration tests may need to touch multiple components
+- Shared test fixtures are harder to manage
+- May need to duplicate test utilities
+- Database state management across components
+
+---
+
+## 🎯 When to Use This Architecture
+
+### ✅ Use When
+
+#### Large, Feature-Rich Applications
+
+- Application has many independent features (10+ major features)
+- Features don't share much business logic
+- Each feature is substantial enough to warrant isolation
+- Long-term project with ongoing feature development
+
+#### Multiple Teams or Large Teams
+
+- Multiple teams working on the same codebase
+- Need clear ownership boundaries
+- Want to minimize merge conflicts
+- Teams work on different features simultaneously
+
+#### Microservices Migration Path
+
+- Planning to eventually split into microservices
+- Want to identify service boundaries early
+- Need ability to extract features independently
+- Testing service separation without distributed systems complexity
+
+#### Domain-Driven Design (DDD)
+
+- Complex business domain with clear bounded contexts
+- Rich domain models with behavior
+- Need to model aggregates and entities
+- Business logic is feature-specific
+
+#### Features Evolve Independently
+
+- Different features change at different rates
+- Need to experiment with new patterns
+- Want to refactor one feature without affecting others
+- A/B testing or feature flags per component
+
+#### Clear Feature Boundaries
+
+- Business features are well-defined and independent
+- Minimal cross-feature business logic
+- Each feature has its own data model
+- Features can be developed in parallel
+
+#### Long-Term Maintainability Priority
+
+- Code needs to be maintainable for years
+- Many developers will work on the project over time
+- Need clear navigation and understanding
+- Onboarding new developers should be fast
+
+#### Modular Monolith Approach
+
+- Want microservices benefits without distribution
+- Need strong boundaries in a monolith
+- Plan to keep as monolith but modular
+- Want option to split later without rewrite
+
+### ❌ Avoid When
+
+#### Small CRUD Applications
+
+- Simple create, read, update, delete operations
+- Less than 5 major features
+- Straightforward business logic
+- Traditional layered is simpler and faster
+
+#### Heavy Shared Business Logic
+
+- Multiple features share complex business rules
+- Central validation logic across all features
+- Shared workflows that span features
+- Reusable service layer is essential
+
+#### Small Team or Solo Developer
+
+- Single developer or team of 2-3
+- No merge conflicts to worry about
+- Additional structure provides no benefit
+- Overhead outweighs advantages
+
+#### Rapid Prototyping / MVP
+
+- Need to build quickly and iterate fast
+- Requirements are unclear
+- May throw away and rewrite
+- Time to market is critical
+
+#### Tight Cross-Feature Coupling Required
+
+- Features are highly interdependent
+- Complex transactions across multiple features
+- Shared state management is critical
+- Features can't function independently
+
+#### Team Lacks Experience
+
+- Team is unfamiliar with vertical slice architecture
+- No time for learning and training
+- Existing expertise in layered architecture
+- Risk of improper implementation
+
+#### Consistency is Critical
+
+- All features must work exactly the same way
+- Standardized patterns across entire application
+- Centralized control over all operations
+- No deviation allowed between features
+
+#### Simple Data-Centric Applications
+
+- Focus is on data storage and retrieval
+- Minimal business logic
+- Reports and data views
+- Database is the primary concern
+
+### 🆚 Quick Decision Guide
+
+| Factor                | Layered          | Unidirectional Component        |
+| --------------------- | ---------------- | ------------------------------- |
+| **Team Size**         | 1-5 developers   | 6+ developers or multiple teams |
+| **App Size**          | Small to medium  | Large, many features            |
+| **Features**          | 3-8 features     | 10+ features                    |
+| **Shared Logic**      | Heavy            | Minimal                         |
+| **Feature Coupling**  | High             | Low                             |
+| **Future Plan**       | Stay monolithic  | May split to microservices      |
+| **Development Speed** | Faster initially | Faster long-term                |
+| **Complexity**        | Lower            | Higher                          |
+| **Maintainability**   | Good for small   | Better for large                |
+
+---
 
 ## 🛠️ Technology Stack
 
@@ -152,33 +389,35 @@ Each operation has its own handler class with a single `execute()` method:
 - **Validation**: [Pydantic](https://docs.pydantic.dev/) - Data validation using Python type hints
 - **Server**: [Uvicorn](https://www.uvicorn.org/) - ASGI server implementation
 
-## 📋 Prerequisites
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
 
 - Python 3.10 or higher
 - pip (Python package manager)
 
-## 🚀 Getting Started
-
-### 1. Installation
+### Installation
 
 ```bash
-# Navigate to the project directory
-cd architectural-patterns/rest/02-unidirectional-component/todo-app/python
+# 1. Navigate to the project directory
+cd architectural-patterns/rest/02-vertical-slice-command-handlers/todo-app/python
 
-# Create a virtual environment
+# 2. Create a virtual environment
 python -m venv venv
 
-# Activate the virtual environment
+# 3. Activate the virtual environment
 # On Linux/macOS:
 source venv/bin/activate
 # On Windows:
 # venv\Scripts\activate
 
-# Install dependencies
+# 4. Install dependencies
 pip install -r requirements.txt
 ```
 
-### 2. Database Setup
+### Database Setup
 
 ```bash
 # Run database migrations to create tables
@@ -187,7 +426,7 @@ alembic upgrade head
 
 This creates a `todos.db` SQLite database file with the required schema.
 
-### 3. Run the Application
+### Run the Application
 
 ```bash
 # Start the development server
@@ -196,87 +435,14 @@ uvicorn app.main:app --reload
 
 The API will be available at `http://localhost:8000`
 
-### 4. Access API Documentation
+### Access API Documentation
 
 FastAPI automatically generates interactive API documentation:
 
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 
-## 📡 API Endpoints
-
-| Method | Endpoint | Description | Handler/Query | Response |
-|--------|----------|-------------|---------------|----------|
-| `POST` | `/todos/` | Create a new todo | `CreateTodoHandler` | `TodoDTO` (201) |
-| `GET` | `/todos/` | Get all todos (paginated) | `ListTodosQuery` | `List[TodoDTO]` (200) |
-| `GET` | `/todos/{id}` | Get a specific todo | `GetTodoQuery` | `TodoDTO` (200) |
-| `PATCH` | `/todos/{id}` | Update a todo (partial) | `UpdateTodoHandler` | `TodoDTO` (200) |
-| `DELETE` | `/todos/{id}` | Delete a todo | `DeleteTodoHandler` | No content (204) |
-
-### Request/Response Examples
-
-#### Create a Todo (Command)
-```bash
-curl -X POST "http://localhost:8000/todos/" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Buy groceries",
-    "description": "Milk, eggs, bread"
-  }'
-```
-
-**Response (201 Created):**
-```json
-{
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "title": "Buy groceries",
-  "description": "Milk, eggs, bread",
-  "completed": false
-}
-```
-
-#### Get All Todos (Query)
-```bash
-curl -X GET "http://localhost:8000/todos/?skip=0&limit=10"
-```
-
-**Response (200 OK):**
-```json
-[
-  {
-    "id": "550e8400-e29b-41d4-a716-446655440000",
-    "title": "Buy groceries",
-    "description": "Milk, eggs, bread",
-    "completed": false
-  }
-]
-```
-
-#### Update a Todo (Command)
-```bash
-curl -X PATCH "http://localhost:8000/todos/550e8400-e29b-41d4-a716-446655440000" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "completed": true
-  }'
-```
-
-**Response (200 OK):**
-```json
-{
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "title": "Buy groceries",
-  "description": "Milk, eggs, bread",
-  "completed": true
-}
-```
-
-#### Delete a Todo (Command)
-```bash
-curl -X DELETE "http://localhost:8000/todos/550e8400-e29b-41d4-a716-446655440000"
-```
-
-**Response:** `204 No Content`
+---
 
 ## 📁 Project Structure
 
@@ -284,25 +450,31 @@ curl -X DELETE "http://localhost:8000/todos/550e8400-e29b-41d4-a716-446655440000
 python/
 ├── alembic/                          # Database migration files
 │   ├── versions/                     # Migration version files
+│   │   └── aa099c01e412_initial...   # Initial migration
 │   └── env.py                        # Alembic environment config
+│
 ├── app/
 │   ├── main.py                       # Application entry point
+│   │
 │   ├── core/                         # Shared infrastructure
 │   │   └── database.py               # Database config & session
+│   │
 │   └── components/                   # Feature components (vertical slices)
 │       └── todos/                    # Todo component (self-contained)
 │           ├── router.py             # HTTP routes/endpoints
 │           ├── handlers.py           # CQRS handlers (Commands & Queries)
 │           ├── schemas.py            # DTOs and Commands (Pydantic)
 │           └── models.py             # Database model (SQLAlchemy ORM)
+│
 ├── alembic.ini                       # Alembic configuration
 ├── requirements.txt                  # Python dependencies
+├── todos.db                          # SQLite database (created after migration)
 └── README.md                         # This file
 ```
 
-## 🎯 Component Anatomy
+### Component Anatomy
 
-Each component is organized as a vertical slice with all its concerns:
+Each component is organized as a **vertical slice** with all its concerns:
 
 ```
 components/todos/
@@ -327,7 +499,11 @@ components/todos/
     - TodoModel (SQLAlchemy ORM)
 ```
 
-## 🔄 Request Flow Example
+---
+
+## ⚙️ How It Works
+
+### Request Flow Example
 
 Here's what happens when you create a todo:
 
@@ -349,50 +525,99 @@ Here's what happens when you create a todo:
 8. Client receives 201 Created with todo data
 ```
 
-**Key Points:**
-- Router knows about HTTP, not business logic
-- Handler knows about business logic, not HTTP
-- Data flows in one direction (no circular dependencies)
-- Each layer has a single, clear responsibility
+### Key Principles
 
-## 🆚 Comparison with Layered Architecture
+- **Router knows about HTTP, not business logic**
+- **Handler knows about business logic, not HTTP**
+- **Data flows in one direction** (no circular dependencies)
+- **Each layer has a single, clear responsibility**
 
-| Aspect | Layered (N-Tier) | Unidirectional Component |
-|--------|------------------|--------------------------|
-| **Organization** | Horizontal layers | Vertical slices |
-| **Grouping** | By technical concern | By business feature |
-| **Dependencies** | Layer → Layer below | Component → Core only |
-| **Cohesion** | Low (spread across layers) | High (all in one folder) |
-| **Team Structure** | Teams own layers | Teams own components |
-| **Adding Features** | Touch multiple layers | Add one component |
-| **Reusability** | Services reused | Components independent |
-| **Best For** | Shared business logic | Independent features |
+---
 
-### When to Use Each:
+## 📡 API Endpoints
 
-**Layered Architecture:**
-- Applications with heavy shared business logic
-- Small to medium teams
-- Consistent patterns across features
-- Traditional enterprise applications
+| Method   | Endpoint      | Description               | Handler/Query       | Response              |
+| -------- | ------------- | ------------------------- | ------------------- | --------------------- |
+| `POST`   | `/todos/`     | Create a new todo         | `CreateTodoHandler` | `TodoDTO` (201)       |
+| `GET`    | `/todos/`     | Get all todos (paginated) | `ListTodosQuery`    | `List[TodoDTO]` (200) |
+| `GET`    | `/todos/{id}` | Get a specific todo       | `GetTodoQuery`      | `TodoDTO` (200)       |
+| `PATCH`  | `/todos/{id}` | Update a todo (partial)   | `UpdateTodoHandler` | `TodoDTO` (200)       |
+| `DELETE` | `/todos/{id}` | Delete a todo             | `DeleteTodoHandler` | No content (204)      |
 
-**Unidirectional Component:**
-- Large applications with many features
-- Microservices-style modularity in a monolith
-- Large or distributed teams
-- Features that evolve independently
-- Domain-Driven Design (DDD) approach
+### Request/Response Examples
 
-## 🧪 Testing the API
+#### Create a Todo (Command)
 
-You can test the API using the interactive documentation at `http://localhost:8000/docs` or use tools like:
+```bash
+curl -X POST "http://localhost:8000/todos/" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Buy groceries",
+    "description": "Milk, eggs, bread"
+  }'
+```
 
-- **curl** (command line)
-- **Postman** (GUI)
-- **HTTPie** (command line)
-- **Thunder Client** (VS Code extension)
+**Response (201 Created):**
 
-### Example with HTTPie:
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "title": "Buy groceries",
+  "description": "Milk, eggs, bread",
+  "completed": false
+}
+```
+
+#### Get All Todos (Query)
+
+```bash
+curl -X GET "http://localhost:8000/todos/?skip=0&limit=10"
+```
+
+**Response (200 OK):**
+
+```json
+[
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "title": "Buy groceries",
+    "description": "Milk, eggs, bread",
+    "completed": false
+  }
+]
+```
+
+#### Update a Todo (Command)
+
+```bash
+curl -X PATCH "http://localhost:8000/todos/550e8400-e29b-41d4-a716-446655440000" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "completed": true
+  }'
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "title": "Buy groceries",
+  "description": "Milk, eggs, bread",
+  "completed": true
+}
+```
+
+#### Delete a Todo (Command)
+
+```bash
+curl -X DELETE "http://localhost:8000/todos/550e8400-e29b-41d4-a716-446655440000"
+```
+
+**Response:** `204 No Content`
+
+### Testing with HTTPie
+
 ```bash
 # Install httpie
 pip install httpie
@@ -413,15 +638,195 @@ http PATCH localhost:8000/todos/{id} completed:=true
 http DELETE localhost:8000/todos/{id}
 ```
 
+---
+
+## 🎓 Design Patterns
+
+This application uses several complementary design patterns:
+
+### 1. Unidirectional Component Architecture (Vertical Slices)
+
+**What**: Organize code by business features instead of technical layers
+
+**Benefits**:
+
+- All related code lives together
+- Easy to understand a feature by looking at one folder
+- Components can be added/removed independently
+- Reduces coupling between features
+- Teams can own specific components
+
+**Example**:
+
+```
+components/todos/          # Everything for todos in one place
+  ├── router.py
+  ├── handlers.py
+  ├── schemas.py
+  └── models.py
+```
+
+### 2. CQRS (Command Query Responsibility Segregation)
+
+**What**: Separate read operations (Queries) from write operations (Commands)
+
+**Commands** (Write Operations):
+
+- `CreateTodoHandler` - Creates new todos
+- `UpdateTodoHandler` - Updates existing todos
+- `DeleteTodoHandler` - Deletes todos
+- Modify state
+- Can be async/queued
+- Validation heavy
+
+**Queries** (Read Operations):
+
+- `GetTodoQuery` - Fetches a single todo
+- `ListTodosQuery` - Lists todos with pagination
+- Read state only
+- Never modify data
+- Can be cached
+- Optimized for speed
+
+**Benefits**:
+
+- Clear separation of reads and writes
+- Optimize queries and commands independently
+- Different validation rules for each
+- Easier to scale (separate read/write databases if needed)
+
+### 3. Handler Pattern (Single Responsibility)
+
+**What**: Each operation has its own handler class with a single `execute()` method
+
+**Benefits**:
+
+- One class = one responsibility
+- Easy to test in isolation
+- Easy to understand and modify
+- Reusable across different contexts
+
+**Example**:
+
+```python
+class CreateTodoHandler:
+    @staticmethod
+    def execute(command: CreateTodoCommand, db: Session) -> TodoDTO:
+        # Single responsibility: create a todo
+        ...
+```
+
+### 4. Data Transfer Object (DTO) Pattern
+
+**What**: Use dedicated objects for data transfer between layers
+
+**Commands** (Input):
+
+- `CreateTodoCommand` - Represents intent to create
+- `UpdateTodoCommand` - Represents intent to update
+
+**DTOs** (Output):
+
+- `TodoDTO` - Immutable data for responses
+
+**Benefits**:
+
+- Clear API contracts
+- Separate internal models from external API
+- Type-safe validation via Pydantic
+- Consistent response format
+
+### 5. Dependency Injection
+
+**What**: Inject dependencies (like database sessions) rather than creating them
+
+**Example**:
+
+```python
+@router.post("/todos/", status_code=status.HTTP_201_CREATED)
+def create_todo(
+    command: CreateTodoCommand,
+    db: Session = Depends(get_db)  # Injected
+) -> TodoDTO:
+    return CreateTodoHandler.execute(command, db)
+```
+
+**Benefits**:
+
+- Loose coupling between components and infrastructure
+- Easy to test with mock dependencies
+- Centralized configuration
+
+---
+
+## 💡 Best Practices
+
+### ✅ DO
+
+- **Keep components independent and self-contained**
+  - Each component should work on its own
+  - Avoid direct dependencies between components
+
+- **Use handlers for all business logic**
+  - Keep routers thin (only HTTP concerns)
+  - Put all domain logic in handlers
+
+- **Follow CQRS: separate reads from writes**
+  - Commands modify state
+  - Queries only read state
+  - Never mix the two
+
+- **Use DTOs for all API responses**
+  - Don't expose database models directly
+  - Create explicit contracts with DTOs
+
+- **Name by intent, not implementation**
+  - Use `CreateTodoCommand` not `CreateTodoRequest`
+  - Use `TodoDTO` not `TodoResponse`
+
+- **Reuse queries in commands**
+  - `UpdateTodoHandler` can use `GetTodoQuery`
+  - Promotes consistency
+
+### ❌ DON'T
+
+- **Don't create dependencies between components**
+  - Todo component shouldn't call User component directly
+  - Use events or shared core for cross-component needs
+
+- **Don't put business logic in routers**
+  - Routers should only handle HTTP concerns
+  - Move logic to handlers
+
+- **Don't mix commands and queries**
+  - Queries should never modify data
+  - Commands should represent state changes
+
+- **Don't expose database models directly**
+  - Always use DTOs for API responses
+  - Keeps internal structure flexible
+
+- **Don't create shared service layers**
+  - This defeats the purpose of vertical slices
+  - Extract truly shared code to core instead
+
+- **Don't use generic names**
+  - `TodoDTO` is better than `TodoResponse`
+  - `CreateTodoCommand` is better than `TodoInput`
+
+---
+
 ## 📚 Database Migrations
 
 ### Create a New Migration
+
 ```bash
 # Auto-generate migration from model changes
 alembic revision --autogenerate -m "description of changes"
 ```
 
 ### Apply Migrations
+
 ```bash
 # Upgrade to latest version
 alembic upgrade head
@@ -434,6 +839,7 @@ alembic upgrade <revision_id>
 ```
 
 ### Rollback Migrations
+
 ```bash
 # Downgrade one version
 alembic downgrade -1
@@ -446,6 +852,7 @@ alembic downgrade base
 ```
 
 ### View Migration History
+
 ```bash
 # Show current version
 alembic current
@@ -454,135 +861,107 @@ alembic current
 alembic history
 ```
 
-## 🎓 Design Patterns Used
-
-### 1. **Unidirectional Component Architecture**
-- Components are vertical slices of functionality
-- Each component is self-contained and independent
-- Data flows in one direction through the component
-- No circular dependencies between components
-
-### 2. **CQRS (Command Query Responsibility Segregation)**
-- Commands modify state (CreateTodo, UpdateTodo, DeleteTodo)
-- Queries read state (GetTodo, ListTodos)
-- Clear separation enables independent optimization
-- Different models for reads and writes if needed
-
-### 3. **Handler Pattern**
-- Each operation has a dedicated handler class
-- Handlers are stateless with static execute() methods
-- Single Responsibility Principle (SRP)
-- Easy to test and maintain
-
-### 4. **Data Transfer Object (DTO) Pattern**
-- Commands represent intent (CreateTodoCommand)
-- DTOs represent data (TodoDTO)
-- Separation of concerns between internal and external models
-- Type-safe contracts via Pydantic
-
-### 5. **Dependency Injection**
-- Database sessions injected via FastAPI's Depends()
-- Loose coupling between components and infrastructure
-- Easy to test with mock dependencies
+---
 
 ## 🔧 Adding a New Component
 
 To add a new component (e.g., "users"), follow these steps:
 
+### 1. Create Component Structure
+
 ```bash
-# 1. Create component directory
+# Create component directory
 mkdir -p app/components/users
 
-# 2. Create component files
+# Create component files
+touch app/components/users/__init__.py
 touch app/components/users/router.py       # HTTP routes
 touch app/components/users/handlers.py     # CQRS handlers
 touch app/components/users/schemas.py      # DTOs and commands
 touch app/components/users/models.py       # ORM models
-
-# 3. Register the router in app/main.py
 ```
 
-**Example component registration:**
+### 2. Implement Component Files
+
+Follow the same pattern as the `todos` component:
+
+- Define models in `models.py`
+- Create DTOs and commands in `schemas.py`
+- Implement handlers in `handlers.py`
+- Create routes in `router.py`
+
+### 3. Register the Router
+
 ```python
 # app/main.py
 from app.components.todos.router import router as todo_router
 from app.components.users.router import router as user_router  # New
 
-app.include_router(todo_router)
-app.include_router(user_router)  # New
+app.include_router(todo_router, tags=["todos"])
+app.include_router(user_router, tags=["users"])  # New
 ```
 
-## 💡 Best Practices
+### 4. Create Database Migration
 
-### ✅ DO:
-- Keep components independent and self-contained
-- Use handlers for all business logic
-- Follow CQRS: separate reads from writes
-- Use DTOs for all API responses
-- Keep routers thin (only HTTP concerns)
-- Name commands by intent (CreateTodoCommand, not CreateTodoRequest)
-- Reuse queries in other handlers (e.g., GetTodoQuery in UpdateTodoHandler)
+```bash
+# Generate migration for new model
+alembic revision --autogenerate -m "add users component"
 
-### ❌ DON'T:
-- Don't create dependencies between components
-- Don't put business logic in routers
-- Don't mix commands and queries
-- Don't expose database models directly via API
-- Don't create shared service layers across components
-- Don't use generic names (use TodoDTO, not TodoResponse)
+# Apply migration
+alembic upgrade head
+```
 
-## 🎯 Architecture Benefits
-
-### For Developers:
-✅ **Easy to Navigate**: All code for a feature is in one place  
-✅ **Easy to Test**: Each handler can be tested independently  
-✅ **Easy to Understand**: Clear, unidirectional data flow  
-✅ **Easy to Modify**: Changes are localized to one component  
-
-### For Teams:
-✅ **Parallel Development**: Teams can work on different components  
-✅ **Clear Ownership**: Each team owns specific components  
-✅ **Reduced Conflicts**: No shared service layer to conflict over  
-✅ **Flexible Scaling**: Can extract components into microservices  
-
-### For Architecture:
-✅ **Loose Coupling**: Components don't depend on each other  
-✅ **High Cohesion**: Related code stays together  
-✅ **Scalable**: Easy to add new features without affecting existing ones  
-✅ **Maintainable**: Clear boundaries and responsibilities  
-
-## 📖 Learning Resources
-
-### Understanding the Architecture
-
-**Unidirectional Component Architecture:**
-- Organizes by feature, not by technical layer
-- Each component is a vertical slice with all its concerns
-- Components communicate through DTOs, not direct references
-- Core provides shared infrastructure
-
-**CQRS Pattern:**
-- Commands change state, Queries read state
-- Can have different models for reads and writes
-- Enables independent scaling and optimization
-- Clear separation of concerns
-
-**When to Use This Architecture:**
-- ✅ Large applications with many features
-- ✅ Multiple teams working on the same codebase
-- ✅ Features that evolve independently
-- ✅ Need to extract features into microservices later
-- ✅ Domain-Driven Design approach
-
-**When NOT to Use:**
-- ❌ Small, simple CRUD applications
-- ❌ Heavy cross-feature business logic
-- ❌ Single developer/small team
-- ❌ Tight coupling required between features
+---
 
 ## 🤝 Contributing
 
-Feel free to explore, modify, and experiment with this codebase to better understand unidirectional component architecture and CQRS patterns!
+This is an educational project demonstrating architectural patterns. Feel free to:
+
+- Explore the codebase
+- Experiment with modifications
+- Add new components following the established patterns
+- Share feedback and improvements
+
+### Learning Goals
+
+After working with this project, you should understand:
+
+- How to organize code by features (vertical slices)
+- How to implement CQRS pattern
+- How to maintain unidirectional data flow
+- When to use this architecture vs traditional layered architecture
+- How to add new features without affecting existing ones
+
+---
+
+## 📖 Additional Resources
+
+### Architecture Patterns
+
+- **Vertical Slice Architecture**: Features organized by domain, not technology
+- **CQRS**: Commands change state, Queries read state
+- **Handler Pattern**: Single-responsibility operation handlers
+- **DTO Pattern**: Explicit data contracts
+
+### When to Use Different Architectures
+
+**Use Unidirectional Component Architecture for**:
+
+- ✅ Large applications with many features
+- ✅ Multiple teams working on the same codebase
+- ✅ Features that evolve independently
+- ✅ Microservices migration path
+- ✅ Domain-Driven Design approach
+
+**Use Traditional Layered Architecture for**:
+
+- ✅ Small, simple CRUD applications
+- ✅ Heavy cross-feature business logic
+- ✅ Small teams (1-5 developers)
+- ✅ Rapid prototyping
+- ✅ Traditional enterprise applications
+
+---
 
 ## 📝 License
 

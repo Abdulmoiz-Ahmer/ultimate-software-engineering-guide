@@ -2,150 +2,448 @@
 
 A RESTful Todo API built with FastAPI demonstrating the classic **Model-View-Controller (MVC)** architectural pattern. This project showcases the separation of concerns between data (Model), presentation (View), and business logic (Controller).
 
-## 🏗️ Architecture Overview
+---
 
-This application implements the **MVC (Model-View-Controller)** pattern, one of the most established architectural patterns for building web applications:
+## Table of Contents
+
+1. [What is MVC?](#-what-is-mvc)
+2. [Pros of MVC](#-pros-of-mvc)
+3. [Cons of MVC](#-cons-of-mvc)
+4. [When to Use MVC](#-when-to-use-mvc)
+5. [When NOT to Use MVC](#-when-not-to-use-mvc)
+6. [Getting Started](#-getting-started)
+7. [Architecture Overview](#️-architecture-overview)
+8. [API Documentation](#-api-endpoints)
+9. [Project Structure](#-project-structure)
+10. [Best Practices](#-best-practices)
+11. [Evolution Path](#-evolution-path)
+
+---
+
+## 🎯 What is MVC?
+
+**Model-View-Controller (MVC)** is a software architectural pattern that separates an application into three interconnected components:
+
+- **Model**: The data layer - manages the application's data, business rules, and logic for accessing data
+- **View**: The presentation layer - handles the display and formatting of data for the user
+- **Controller**: The orchestration layer - receives user input, processes it (often using the Model), and returns output via the View
+
+**Core Philosophy**: Separate what you see (View) from what you store (Model), with business logic (Controller) acting as the coordinator between them.
+
+### Key Characteristics
+
+1. **Separation of Concerns**: Each component has a distinct responsibility
+2. **Model Independence**: The Model layer doesn't know about Views or Controllers
+3. **Controller as Orchestrator**: The Controller coordinates between Model and View
+4. **View as Presentation**: Views only handle formatting and display logic
+5. **Unidirectional Dependencies**: Model ← Controller → View (Controller knows both, but Model and View are isolated)
+
+### Origins & Evolution
+
+MVC was invented in 1979 by Trygve Reenskaug for Smalltalk at Xerox PARC. Originally designed for desktop GUI applications, it evolved to become one of the most popular patterns for web development:
+
+- **1979**: Original MVC for desktop GUI applications
+- **1996**: Adapted for web applications (server-side rendering)
+- **2000s**: Ruby on Rails popularizes MVC for web
+- **2010s**: REST APIs adapt MVC (Views become JSON schemas)
+- **Today**: Still widely used, especially for CRUD applications
+
+---
+
+## ✅ Pros of MVC
+
+### 1. **Clear Separation of Concerns**
+
+Each component has a well-defined, singular responsibility, making code organization intuitive:
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    MVC Architecture                          │
-│                                                              │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │                    Controller                         │  │
-│  │              (todo_controller.py)                     │  │
-│  │  • Receives HTTP requests                            │  │
-│  │  • Validates business rules                          │  │
-│  │  • Orchestrates Model and View                       │  │
-│  │  • Returns HTTP responses                            │  │
-│  └────────┬──────────────────────────────┬──────────────┘  │
-│           │                               │                  │
-│           ▼                               ▼                  │
-│  ┌────────────────┐            ┌─────────────────────────┐ │
-│  │     Model      │            │         View            │ │
-│  │   (todo.py)    │            │   (todo_view.py)        │ │
-│  │ • Data schema  │            │ • Request schemas       │ │
-│  │ • ORM mapping  │            │ • Response schemas      │ │
-│  │ • Persistence  │            │ • Serialization         │ │
-│  └────────────────┘            └─────────────────────────┘ │
-│         ▲                                                    │
-│         │                                                    │
-│         ▼                                                    │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │                    Database                           │  │
-│  │                  (SQLite/SQLAlchemy)                  │  │
-│  └──────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
+Model      → "What is the data?"
+View       → "How should data be displayed?"
+Controller → "What should happen with the data?"
 ```
 
-### MVC Data Flow
+### 2. **Parallel Development**
 
-```
-1. HTTP Request (JSON)
-        ↓
-2. Controller receives request
-        ↓
-3. Input View validates data
-        ↓
-4. Controller applies business logic
-        ↓
-5. Controller manipulates Model (database)
-        ↓
-6. Output View formats Model data
-        ↓
-7. Controller returns HTTP Response (JSON)
-```
+Teams can work simultaneously on different components:
 
-## 🎯 MVC Components Explained
+- Frontend developers work on Views
+- Backend developers work on Models
+- Full-stack developers coordinate in Controllers
 
-### Model (The "M")
-**Location:** `app/models/todo.py`
+### 3. **Easy to Understand**
 
-The Model represents **what the data is**. It's responsible for:
-- Defining data structure (database schema)
-- Encapsulating data access (ORM)
-- Representing domain entities
-- Being independent of presentation and HTTP concerns
+The pattern is:
+
+- **Well-documented** with decades of literature
+- **Widely adopted** across frameworks (Django, Rails, Laravel, Spring MVC)
+- **Industry standard** that most developers recognize
+- **Simple mental model** that maps to real-world organization
+
+### 4. **Testability**
+
+Each layer can be tested independently:
 
 ```python
-class TodoModel(Base):
-    """The Model - represents data structure"""
-    __tablename__ = "todos"
-    id = Column(UUID, primary_key=True)
-    title = Column(String(100))
-    description = Column(String(255))
-    completed = Column(Boolean, default=False)
+# Test Model in isolation
+def test_todo_model():
+    todo = TodoModel(title="Test")
+    assert todo.title == "Test"
+
+# Test View validation
+def test_view_validation():
+    with pytest.raises(ValidationError):
+        CreateTodoInputView(title="")
+
+# Test Controller logic
+def test_controller(mock_db):
+    result = create_todo(payload, mock_db)
+    assert result.id is not None
 ```
 
-### View (The "V")
-**Location:** `app/views/todo_view.py`
+### 5. **Code Reusability**
 
-The View represents **how the data is presented**. It's responsible for:
-- Defining presentation format (JSON schemas)
-- Input validation (request schemas)
-- Output serialization (response schemas)
-- Being independent of data storage details
+- Models can be used by multiple Controllers
+- Views can be shared across different endpoints
+- Controllers can be split and reorganized without changing Models
+
+### 6. **Maintainability**
+
+Changes are localized:
+
+- Database schema changes? → Update Model
+- API response format changes? → Update View
+- Business logic changes? → Update Controller
+
+### 7. **Framework Support**
+
+Most web frameworks provide MVC out of the box:
+
+- Built-in routing, ORM, validation
+- Convention over configuration
+- Scaffolding tools for rapid development
+
+---
+
+## ❌ Cons of MVC
+
+### 1. **Controller Bloat (Fat Controllers)**
+
+As applications grow, Controllers tend to accumulate too much logic:
 
 ```python
-class TodoResponseView(BaseModel):
-    """The View - defines presentation format"""
-    id: UUID
-    title: str
-    description: str | None
-    completed: bool
-```
+# Controller becomes a "god object"
+@router.post("/todos/")
+def create_todo(payload, db):
+    # Validation logic
+    if not payload.title:
+        raise HTTPException(400, "Title required")
 
-### Controller (The "C")
-**Location:** `app/controllers/todo_controller.py`
-
-The Controller represents **how the data is processed**. It's responsible for:
-- Handling HTTP requests
-- Implementing business logic
-- Coordinating Model and View
-- Error handling and workflow orchestration
-
-```python
-@router.post("/", response_model=TodoResponseView)
-def create_todo(payload: CreateTodoInputView, db: Session):
-    """The Controller - orchestrates Model and View"""
     # Business logic
-    if "forbidden" in payload.title.lower():
-        raise HTTPException(400, "Invalid title")
-    
-    # Manipulate Model
-    todo = TodoModel(title=payload.title, ...)
+    if len(payload.title) > 100:
+        raise HTTPException(400, "Title too long")
+
+    # Authorization logic
+    if not user.can_create_todos():
+        raise HTTPException(403, "Forbidden")
+
+    # Email logic
+    send_notification_email(user.email)
+
+    # Logging logic
+    log_todo_creation(user.id, payload)
+
+    # Database logic
+    todo = TodoModel(**payload.dict())
     db.add(todo)
     db.commit()
-    
-    # Return View
-    return todo  # Auto-converted to TodoResponseView
+    # ... 100 more lines
 ```
 
-## ✨ Key Features
+### 2. **Anemic Domain Model**
 
-- ✅ **Classic MVC Pattern**: Clean separation of Model, View, and Controller
-- ✅ **RESTful API**: Standard HTTP methods and status codes
-- ✅ **Input Validation**: Pydantic schemas validate incoming data
-- ✅ **Output Formatting**: Consistent JSON response format via Views
-- ✅ **Business Logic in Controller**: Validation rules and workflow orchestration
-- ✅ **UUID Primary Keys**: Globally unique identifiers for security
-- ✅ **Type Safety**: Full type hints with Pydantic validation
-- ✅ **Auto-generated Docs**: Interactive API documentation
+MVC often leads to Models that are just data containers with no behavior:
 
-## 🛠️ Technology Stack
+```python
+# Anemic Model - just a data structure
+class TodoModel(Base):
+    id = Column(UUID)
+    title = Column(String)
+    completed = Column(Boolean)
+    # No methods, no behavior, no business logic
+```
 
-- **Framework**: [FastAPI](https://fastapi.tiangolo.com/) - Modern, high-performance web framework
-- **ORM**: [SQLAlchemy](https://www.sqlalchemy.org/) - SQL toolkit and Object-Relational Mapping
-- **Database**: SQLite (easily swappable to PostgreSQL, MySQL, etc.)
-- **Migrations**: [Alembic](https://alembic.sqlalchemy.org/) - Database migration tool
-- **Validation**: [Pydantic](https://docs.pydantic.dev/) - Data validation using Python type hints
-- **Server**: [Uvicorn](https://www.uvicorn.org/) - ASGI server implementation
+**Problem**: Business logic ends up scattered across Controllers instead of being encapsulated in the domain.
 
-## 📋 Prerequisites
+### 3. **Limited Scalability for Complex Logic**
+
+MVC doesn't provide guidance for:
+
+- Complex business workflows
+- Multi-step transactions
+- Domain-driven design patterns
+- Cross-cutting concerns (logging, caching, auth)
+
+### 4. **View-Model Tight Coupling**
+
+While Models don't "know" about Views, Views must match Model structure closely:
+
+```python
+# View must mirror Model fields
+class TodoResponseView(BaseModel):
+    id: UUID           # Must match TodoModel.id type
+    title: str         # Must match TodoModel.title type
+    completed: bool    # Must match TodoModel.completed type
+```
+
+**Problem**: Changing the Model often forces View changes.
+
+### 5. **No Service Layer**
+
+MVC doesn't define where to put:
+
+- External API calls
+- Complex calculations
+- Business orchestration logic
+- Reusable operations
+
+This forces developers to either bloat Controllers or create ad-hoc solutions.
+
+### 6. **Testing Dependencies**
+
+Controllers often become tightly coupled to:
+
+- Database sessions
+- HTTP frameworks
+- Multiple Models and Views
+
+Making comprehensive testing complex:
+
+```python
+# Testing a Controller requires mocking many dependencies
+def test_create_todo(mock_db, mock_email, mock_logger, mock_cache):
+    result = create_todo(payload, mock_db)
+    # Must verify interactions with all dependencies
+```
+
+### 7. **Not Suitable for Modern Frontend Patterns**
+
+MVC was designed for server-side rendering. With modern SPAs:
+
+- Frontend has its own MVC/MVVM
+- Backend serves JSON APIs
+- "View" becomes just a serialization schema
+- The pattern feels awkward and outdated
+
+---
+
+## 🎯 When to Use MVC
+
+### ✅ Perfect Use Cases
+
+#### 1. **Simple CRUD Applications**
+
+When your application primarily creates, reads, updates, and deletes data with minimal business logic:
+
+```
+Examples:
+- Todo list APIs
+- Contact management systems
+- Blog platforms
+- Content management systems (CMS)
+- Admin panels
+```
+
+#### 2. **Rapid Prototyping**
+
+When you need to build and iterate quickly:
+
+- MVC frameworks provide scaffolding
+- Clear structure accelerates development
+- Easy to understand for stakeholders
+
+#### 3. **Small to Medium Applications**
+
+When your application has:
+
+- Fewer than 20-30 entities
+- Straightforward workflows
+- Limited business complexity
+- Small team (1-5 developers)
+
+#### 4. **Database-Centric Applications**
+
+When the database is the core of your application:
+
+- Most operations are data persistence
+- Business logic is mostly validation
+- CRUD operations dominate
+
+#### 5. **RESTful APIs Without Complex Business Logic**
+
+When building REST APIs where:
+
+- Endpoints map to database operations
+- Limited inter-entity relationships
+- Minimal state management
+- Simple request/response flows
+
+#### 6. **Educational Projects**
+
+When learning web development:
+
+- Well-documented pattern
+- Lots of tutorials and resources
+- Supported by major frameworks
+- Good foundation for understanding architecture
+
+#### 7. **Teams with MVC Experience**
+
+When your team:
+
+- Already knows MVC frameworks
+- Has established MVC conventions
+- Needs to onboard developers quickly
+
+### ✅ Good Indicators for MVC
+
+- Most features are "list, create, edit, delete" operations
+- Business rules fit in simple validation checks
+- User workflows are straightforward
+- Data relationships are simple (few joins)
+- You need to ship quickly with limited resources
+
+---
+
+## 🚫 When NOT to Use MVC
+
+### ❌ Avoid MVC For:
+
+#### 1. **Complex Business Logic**
+
+When you have:
+
+```
+- Multi-step workflows (order processing, approval chains)
+- Complex validation rules that span entities
+- Domain-specific business rules
+- Rich domain models with behavior
+- Intricate state machines
+```
+
+**Use Instead**: Layered Architecture with Service layer, Domain-Driven Design
+
+#### 2. **Microservices Architecture**
+
+When building distributed systems:
+
+```
+- Services need clear boundaries
+- Domain logic must be encapsulated
+- Inter-service communication is complex
+- Need independent scalability
+```
+
+**Use Instead**: Domain-Driven Design, Hexagonal Architecture, Clean Architecture
+
+#### 3. **Event-Driven Systems**
+
+When your application:
+
+```
+- Processes events asynchronously
+- Uses message queues (RabbitMQ, Kafka)
+- Needs eventual consistency
+- Has decoupled components communicating via events
+```
+
+**Use Instead**: Event Sourcing, CQRS, Event-Driven Architecture
+
+#### 4. **High-Performance Applications**
+
+When you need:
+
+```
+- Optimized read/write patterns
+- Command and Query separation
+- Denormalized views
+- Caching strategies
+- Database-specific optimizations
+```
+
+**Use Instead**: CQRS (Command Query Responsibility Segregation)
+
+#### 5. **Large Enterprise Applications**
+
+When your application has:
+
+```
+- 50+ entities
+- Multiple bounded contexts
+- Complex domain logic
+- Large development teams (10+ developers)
+- Long-term evolution requirements
+```
+
+**Use Instead**: Domain-Driven Design, Hexagonal Architecture, Modular Monolith
+
+#### 6. **Real-Time Collaborative Systems**
+
+When building:
+
+```
+- Real-time chat applications
+- Collaborative editing tools
+- Live dashboards
+- Multi-player games
+- Streaming applications
+```
+
+**Use Instead**: Actor Model, Reactive Architecture, WebSocket-based patterns
+
+#### 7. **Applications Requiring Complex Testing**
+
+When you need:
+
+```
+- Comprehensive unit test coverage
+- Easy mocking and stubbing
+- Testable business logic in isolation
+- Test-driven development (TDD)
+```
+
+**Use Instead**: Hexagonal Architecture, Clean Architecture (better dependency management)
+
+#### 8. **API Gateway / Backend for Frontend (BFF)**
+
+When building:
+
+```
+- API aggregation layers
+- Multiple frontend-specific APIs
+- Complex data transformation
+- External API orchestration
+```
+
+**Use Instead**: API Gateway pattern, BFF pattern with Service layer
+
+### ❌ Red Flags Against MVC
+
+- Controllers exceed 200-300 lines
+- Repeated logic across Controllers
+- Difficulty writing unit tests without database
+- Models have no methods (pure data bags)
+- Need for transaction management across operations
+- Complex authorization requirements
+- Frequent need for rollbacks or sagas
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
 
 - Python 3.10 or higher
 - pip (Python package manager)
-
-## 🚀 Getting Started
 
 ### 1. Installation
 
@@ -191,201 +489,115 @@ FastAPI automatically generates interactive API documentation:
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 
-## 📡 API Endpoints
+---
 
-| Method | Endpoint | Description | Controller Action | Response View |
-|--------|----------|-------------|-------------------|---------------|
-| `POST` | `/todos/` | Create a new todo | `create_todo()` | `TodoResponseView` (201) |
-| `GET` | `/todos/` | Get all todos | `list_todos()` | `List[TodoResponseView]` (200) |
-| `GET` | `/todos/{id}` | Get a specific todo | `get_todo()` | `TodoResponseView` (200) |
-| `PATCH` | `/todos/{id}` | Update a todo | `update_todo()` | `TodoResponseView` (200) |
-| `DELETE` | `/todos/{id}` | Delete a todo | `delete_todo()` | No content (204) |
+## 🏗️ Architecture Overview
 
-### Request/Response Examples
-
-#### Create a Todo
-```bash
-curl -X POST "http://localhost:8000/todos/" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Buy groceries",
-    "description": "Milk, eggs, bread"
-  }'
-```
-
-**Response (201 Created):**
-```json
-{
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "title": "Buy groceries",
-  "description": "Milk, eggs, bread",
-  "completed": false
-}
-```
-
-#### Get All Todos
-```bash
-curl -X GET "http://localhost:8000/todos/?skip=0&limit=10"
-```
-
-**Response (200 OK):**
-```json
-[
-  {
-    "id": "550e8400-e29b-41d4-a716-446655440000",
-    "title": "Buy groceries",
-    "description": "Milk, eggs, bread",
-    "completed": false
-  }
-]
-```
-
-#### Update a Todo
-```bash
-curl -X PATCH "http://localhost:8000/todos/550e8400-e29b-41d4-a716-446655440000" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "completed": true
-  }'
-```
-
-**Response (200 OK):**
-```json
-{
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "title": "Buy groceries",
-  "description": "Milk, eggs, bread",
-  "completed": true
-}
-```
-
-#### Delete a Todo
-```bash
-curl -X DELETE "http://localhost:8000/todos/550e8400-e29b-41d4-a716-446655440000"
-```
-
-**Response:** `204 No Content`
-
-## 📁 Project Structure
+This application implements the **MVC (Model-View-Controller)** pattern:
 
 ```
-python/
-├── alembic/                          # Database migrations
-│   ├── versions/                     # Migration version files
-│   └── env.py                        # Alembic configuration
-├── app/
-│   ├── controllers/                  # Controller Layer (The "C")
-│   │   └── todo_controller.py        # HTTP request handlers, business logic
-│   ├── models/                       # Model Layer (The "M")
-│   │   └── todo.py                   # Database models (ORM entities)
-│   ├── views/                        # View Layer (The "V")
-│   │   └── todo_view.py              # Request/response schemas
-│   └── database.py                   # Database configuration
-├── main.py                           # Application entry point
-├── alembic.ini                       # Alembic configuration
-├── requirements.txt                  # Python dependencies
-└── README.md                         # This file
+┌─────────────────────────────────────────────────────────────┐
+│                    MVC Architecture                          │
+│                                                              │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │                    Controller                         │  │
+│  │              (todo_controller.py)                     │  │
+│  │  • Receives HTTP requests                            │  │
+│  │  • Validates business rules                          │  │
+│  │  • Orchestrates Model and View                       │  │
+│  │  • Returns HTTP responses                            │  │
+│  └────────┬──────────────────────────────┬──────────────┘  │
+│           │                               │                  │
+│           ▼                               ▼                  │
+│  ┌────────────────┐            ┌─────────────────────────┐ │
+│  │     Model      │            │         View            │ │
+│  │   (todo.py)    │            │   (todo_view.py)        │ │
+│  │ • Data schema  │            │ • Request schemas       │ │
+│  │ • ORM mapping  │            │ • Response schemas      │ │
+│  │ • Persistence  │            │ • Serialization         │ │
+│  └────────────────┘            └─────────────────────────┘ │
+│         ▲                                                    │
+│         │                                                    │
+│         ▼                                                    │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │                    Database                           │  │
+│  │                  (SQLite/SQLAlchemy)                  │  │
+│  └──────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-## 🎯 MVC Pattern Deep Dive
+### MVC Components
 
-### Separation of Concerns
+#### Model (The "M") - `app/models/todo.py`
 
-The MVC pattern enforces **separation of concerns** through three distinct layers:
-
-| Component | Concern | Independence |
-|-----------|---------|--------------|
-| **Model** | Data structure & persistence | Independent of View and Controller |
-| **View** | Presentation & formatting | Independent of Model details |
-| **Controller** | Business logic & orchestration | Knows about both Model and View |
-
-### Responsibilities Matrix
-
-| Task | Model | View | Controller |
-|------|-------|------|------------|
-| Define data schema | ✅ | ❌ | ❌ |
-| Database queries | ✅ | ❌ | ✅ (initiates) |
-| Validate input | ❌ | ✅ | ✅ (checks) |
-| Business rules | ❌ | ❌ | ✅ |
-| Format responses | ❌ | ✅ | ❌ |
-| Handle HTTP | ❌ | ❌ | ✅ |
-| Error handling | ❌ | ❌ | ✅ |
-
-### MVC in Action: Create Todo Flow
-
-Let's trace what happens when you create a todo:
+The Model represents **what the data is**:
 
 ```python
-# 1. HTTP Request arrives
-POST /todos/
-{
-  "title": "Learn MVC",
-  "description": "Study the pattern"
-}
-
-# 2. FastAPI routes to Controller
-@router.post("/", response_model=TodoResponseView)
-def create_todo(payload: CreateTodoInputView, db: Session):
-    
-    # 3. Input View validates data
-    # CreateTodoInputView ensures title is 1-100 chars
-    # Pydantic raises error if validation fails
-    
-    # 4. Controller applies business logic
-    if "forbidden" in payload.title.lower():
-        raise HTTPException(400, "Invalid title")
-    
-    # 5. Controller creates Model
-    todo = TodoModel(
-        title=payload.title,
-        description=payload.description
-    )
-    
-    # 6. Controller persists Model
-    db.add(todo)
-    db.commit()
-    db.refresh(todo)
-    
-    # 7. Controller returns Model
-    # FastAPI converts TodoModel to TodoResponseView
-    return todo
-
-# 8. Output View formats response
-# TodoResponseView serializes Model to JSON
-{
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "title": "Learn MVC",
-  "description": "Study the pattern",
-  "completed": false
-}
+class TodoModel(Base):
+    """The Model - represents data structure"""
+    __tablename__ = "todos"
+    id = Column(UUID, primary_key=True)
+    title = Column(String(100))
+    description = Column(String(255))
+    completed = Column(Boolean, default=False)
 ```
 
-## 🆚 MVC vs Other Patterns
+**Responsibilities:**
 
-### MVC vs Layered Architecture
+- Defining data structure (database schema)
+- Encapsulating data access (ORM)
+- Representing domain entities
+- Being independent of presentation and HTTP concerns
 
-| Aspect | MVC | Layered (N-Tier) |
-|--------|-----|------------------|
-| **Organization** | Model-View-Controller | Presentation-Business-Data |
-| **Focus** | Presentation pattern | Architectural pattern |
-| **Layers** | 3 (M-V-C) | 4+ (API-Service-Repository-Model) |
-| **Business Logic** | In Controller | In Service Layer |
-| **Complexity** | Simple, flat | More abstraction layers |
-| **Best For** | Simple CRUD apps | Complex business logic |
+#### View (The "V") - `app/views/todo_view.py`
 
-### MVC vs Component Architecture
+The View represents **how the data is presented**:
 
-| Aspect | MVC | Unidirectional Component |
-|--------|-----|--------------------------|
-| **Organization** | By concern (M/V/C) | By feature (components) |
-| **Files** | Grouped by type | Grouped by feature |
-| **Coupling** | Controller couples M & V | Components independent |
-| **Scalability** | Horizontal (add more MVCs) | Vertical (add more components) |
-| **Best For** | Traditional apps | Large feature sets |
+```python
+class TodoResponseView(BaseModel):
+    """The View - defines presentation format"""
+    id: UUID
+    title: str
+    description: str | None
+    completed: bool
+```
 
-## 🔄 Request Lifecycle
+**Responsibilities:**
 
-Understanding the complete request lifecycle in MVC:
+- Defining presentation format (JSON schemas)
+- Input validation (request schemas)
+- Output serialization (response schemas)
+- Being independent of data storage details
+
+#### Controller (The "C") - `app/controllers/todo_controller.py`
+
+The Controller represents **how the data is processed**:
+
+```python
+@router.post("/", response_model=TodoResponseView)
+def create_todo(payload: CreateTodoInputView, db: Session):
+    """The Controller - orchestrates Model and View"""
+    # Business logic
+    if "forbidden" in payload.title.lower():
+        raise HTTPException(400, "Invalid title")
+
+    # Manipulate Model
+    todo = TodoModel(title=payload.title, ...)
+    db.add(todo)
+    db.commit()
+
+    # Return View
+    return todo  # Auto-converted to TodoResponseView
+```
+
+**Responsibilities:**
+
+- Handling HTTP requests
+- Implementing business logic
+- Coordinating Model and View
+- Error handling and workflow orchestration
+
+### Request Lifecycle
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -424,103 +636,143 @@ Understanding the complete request lifecycle in MVC:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## 🧪 Testing the API
+### Separation of Concerns
 
-You can test the API using the interactive documentation at `http://localhost:8000/docs` or use tools like:
+| Component      | Concern                        | Independence                       |
+| -------------- | ------------------------------ | ---------------------------------- |
+| **Model**      | Data structure & persistence   | Independent of View and Controller |
+| **View**       | Presentation & formatting      | Independent of Model details       |
+| **Controller** | Business logic & orchestration | Knows about both Model and View    |
 
+### Responsibilities Matrix
+
+| Task               | Model | View | Controller     |
+| ------------------ | ----- | ---- | -------------- |
+| Define data schema | ✅    | ❌   | ❌             |
+| Database queries   | ✅    | ❌   | ✅ (initiates) |
+| Validate input     | ❌    | ✅   | ✅ (checks)    |
+| Business rules     | ❌    | ❌   | ✅             |
+| Format responses   | ❌    | ✅   | ❌             |
+| Handle HTTP        | ❌    | ❌   | ✅             |
+| Error handling     | ❌    | ❌   | ✅             |
+
+---
+
+## 📡 API Endpoints
+
+| Method   | Endpoint      | Description         | Controller Action | Response View                  |
+| -------- | ------------- | ------------------- | ----------------- | ------------------------------ |
+| `POST`   | `/todos/`     | Create a new todo   | `create_todo()`   | `TodoResponseView` (201)       |
+| `GET`    | `/todos/`     | Get all todos       | `list_todos()`    | `List[TodoResponseView]` (200) |
+| `GET`    | `/todos/{id}` | Get a specific todo | `get_todo()`      | `TodoResponseView` (200)       |
+| `PATCH`  | `/todos/{id}` | Update a todo       | `update_todo()`   | `TodoResponseView` (200)       |
+| `DELETE` | `/todos/{id}` | Delete a todo       | `delete_todo()`   | No content (204)               |
+
+### Example Requests
+
+#### Create a Todo
+
+```bash
+curl -X POST "http://localhost:8000/todos/" \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Buy groceries", "description": "Milk, eggs, bread"}'
+```
+
+**Response (201 Created):**
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "title": "Buy groceries",
+  "description": "Milk, eggs, bread",
+  "completed": false
+}
+```
+
+#### Get All Todos
+
+```bash
+curl -X GET "http://localhost:8000/todos/?skip=0&limit=10"
+```
+
+#### Update a Todo
+
+```bash
+curl -X PATCH "http://localhost:8000/todos/550e8400-e29b-41d4-a716-446655440000" \
+  -H "Content-Type: application/json" \
+  -d '{"completed": true}'
+```
+
+#### Delete a Todo
+
+```bash
+curl -X DELETE "http://localhost:8000/todos/550e8400-e29b-41d4-a716-446655440000"
+```
+
+### Testing the API
+
+You can test the API using:
+
+- **Swagger UI**: http://localhost:8000/docs (recommended)
 - **curl** (command line)
 - **Postman** (GUI)
 - **HTTPie** (command line)
 - **Thunder Client** (VS Code extension)
 
-### Example with HTTPie:
-```bash
-# Install httpie
-pip install httpie
+---
 
-# Create a todo
-http POST localhost:8000/todos/ title="Learn MVC" description="Study pattern"
+## 📁 Project Structure
 
-# Get all todos
-http GET localhost:8000/todos/
-
-# Get one todo
-http GET localhost:8000/todos/{id}
-
-# Update a todo
-http PATCH localhost:8000/todos/{id} completed:=true
-
-# Delete a todo
-http DELETE localhost:8000/todos/{id}
+```
+python/
+├── alembic/                          # Database migrations
+│   ├── versions/                     # Migration version files
+│   └── env.py                        # Alembic configuration
+├── app/
+│   ├── controllers/                  # Controller Layer (The "C")
+│   │   └── todo_controller.py        # HTTP request handlers, business logic
+│   ├── models/                       # Model Layer (The "M")
+│   │   └── todo.py                   # Database models (ORM entities)
+│   ├── views/                        # View Layer (The "V")
+│   │   └── todo_view.py              # Request/response schemas
+│   └── database.py                   # Database configuration
+├── main.py                           # Application entry point
+├── alembic.ini                       # Alembic configuration
+├── requirements.txt                  # Python dependencies
+└── README.md                         # This file
 ```
 
-## 📚 Database Migrations
+### Technology Stack
 
-### Create a New Migration
-```bash
-# Auto-generate migration from model changes
-alembic revision --autogenerate -m "description of changes"
-```
+- **Framework**: [FastAPI](https://fastapi.tiangolo.com/) - Modern, high-performance web framework
+- **ORM**: [SQLAlchemy](https://www.sqlalchemy.org/) - SQL toolkit and Object-Relational Mapping
+- **Database**: SQLite (easily swappable to PostgreSQL, MySQL, etc.)
+- **Migrations**: [Alembic](https://alembic.sqlalchemy.org/) - Database migration tool
+- **Validation**: [Pydantic](https://docs.pydantic.dev/) - Data validation using Python type hints
+- **Server**: [Uvicorn](https://www.uvicorn.org/) - ASGI server implementation
 
-### Apply Migrations
-```bash
-# Upgrade to latest version
-alembic upgrade head
-
-# Upgrade one version
-alembic upgrade +1
-```
-
-### Rollback Migrations
-```bash
-# Downgrade one version
-alembic downgrade -1
-
-# Downgrade to base
-alembic downgrade base
-```
-
-## 🎓 Design Principles
-
-### 1. **Separation of Concerns**
-Each component has a single, well-defined responsibility:
-- **Model**: "I know what the data is"
-- **View**: "I know how the data looks"
-- **Controller**: "I know what to do with the data"
-
-### 2. **Loose Coupling**
-- Model doesn't know about View or Controller
-- View doesn't know about Model structure details
-- Controller coordinates but doesn't tightly bind M and V
-
-### 3. **Single Responsibility Principle (SRP)**
-Each MVC component focuses on one aspect:
-- Model = Data
-- View = Presentation
-- Controller = Logic
-
-### 4. **Don't Repeat Yourself (DRY)**
-- Models define schema once (used by all controllers)
-- Views define format once (used across all responses)
-- Controllers reuse Models and Views
+---
 
 ## 💡 Best Practices
 
 ### ✅ DO:
 
 **Models:**
+
 - Keep models focused on data structure
 - Use ORM features (relationships, constraints)
 - Make models independent of HTTP concerns
 - Use meaningful field names and types
 
 **Views:**
+
 - Create separate input and output views
 - Use Pydantic for automatic validation
 - Keep views focused on presentation
 - Use descriptive view names (TodoResponseView, not TodoDTO)
 
 **Controllers:**
+
 - Put business logic in controllers
 - Keep controllers thin (delegate to services if needed)
 - Handle all error cases
@@ -536,108 +788,132 @@ Each MVC component focuses on one aspect:
 - Don't mix concerns between M-V-C
 - Don't expose internal Model structure in Views
 
-## 🎯 When to Use MVC
+### Design Principles
 
-### ✅ MVC is Great For:
+1. **Separation of Concerns**: Each component has a single, well-defined responsibility
+2. **Loose Coupling**: Model doesn't know about View or Controller
+3. **Single Responsibility Principle (SRP)**: Model = Data, View = Presentation, Controller = Logic
+4. **Don't Repeat Yourself (DRY)**: Reuse Models and Views across Controllers
 
-- **Simple CRUD applications** - Straightforward create/read/update/delete
-- **Rapid prototyping** - Quick to set up and understand
-- **Small to medium apps** - Not overly complex
-- **Traditional web apps** - Originally designed for web
-- **RESTful APIs** - Clean mapping to HTTP methods
-- **Learning architectures** - Classic, well-documented pattern
+---
 
-### ❌ Consider Alternatives When:
+## 🔄 Evolution Path
 
-- **Complex business logic** - Use Layered Architecture with Service layer
-- **Many independent features** - Use Component Architecture
-- **Event-driven systems** - Use Event Sourcing or CQRS
-- **Microservices** - Use Domain-Driven Design
-- **Real-time updates** - Consider Observer pattern or WebSockets
+### Signs You've Outgrown MVC
 
-## 🔧 Extending the Application
+1. Controllers are becoming unmanageable (>500 lines)
+2. Duplicated logic across Controllers
+3. Complex business rules scattered everywhere
+4. Difficulty testing without full database
+5. Need for transaction scripts across entities
+6. Models are anemic (no behavior)
+7. Team struggles to locate business logic
 
-### Adding a New Entity (e.g., Users)
+### Migration Strategies
 
-1. **Create Model** (`app/models/user.py`):
+#### Phase 1: Introduce Service Layer
+
 ```python
-class UserModel(Base):
-    __tablename__ = "users"
-    id = Column(UUID, primary_key=True, default=uuid.uuid4)
-    name = Column(String(100))
-    email = Column(String(255))
-```
+# Extract logic from Controller to Service
+class TodoService:
+    def create_todo(self, payload: CreateTodoInputView) -> TodoModel:
+        # Business logic here
+        if "forbidden" in payload.title:
+            raise BusinessRuleViolation()
+        return TodoModel(**payload.dict())
 
-2. **Create Views** (`app/views/user_view.py`):
-```python
-class CreateUserInputView(BaseModel):
-    name: str
-    email: str
-
-class UserResponseView(BaseModel):
-    id: UUID
-    name: str
-    email: str
-```
-
-3. **Create Controller** (`app/controllers/user_controller.py`):
-```python
-router = APIRouter(prefix="/users", tags=["Users"])
-
-@router.post("/", response_model=UserResponseView)
-def create_user(payload: CreateUserInputView, db: Session):
-    user = UserModel(name=payload.name, email=payload.email)
-    db.add(user)
+# Controller becomes thin
+@router.post("/")
+def create_todo(payload: CreateTodoInputView, db: Session):
+    service = TodoService()
+    todo = service.create_todo(payload)
+    db.add(todo)
     db.commit()
-    return user
+    return todo
 ```
 
-4. **Register in main.py**:
+#### Phase 2: Introduce Repository Pattern
+
 ```python
-from app.controllers.user_controller import router as user_router
-app.include_router(user_router)
+# Abstract data access
+class TodoRepository:
+    def add(self, todo: TodoModel):
+        # Data access logic
+
+    def find_by_id(self, id: UUID) -> TodoModel:
+        # Query logic
 ```
 
-## 🎯 Architecture Benefits
+#### Phase 3: Move to Layered Architecture
 
-### For Developers:
-✅ **Easy to Learn**: Classic, well-documented pattern  
-✅ **Easy to Navigate**: Clear folder structure (models/views/controllers)  
-✅ **Easy to Test**: Each component testable independently  
-✅ **Familiar**: Used by many frameworks (Django, Rails, Laravel)  
+```
+Controller → Service → Repository → Model
+(API)      → (Business) → (Data)  → (Domain)
+```
 
-### For Projects:
-✅ **Quick Setup**: Straightforward structure for CRUD apps  
-✅ **Clear Responsibilities**: No confusion about where code goes  
-✅ **Maintainable**: Changes are localized to one component  
-✅ **Scalable**: Can grow to service-based architecture if needed  
+#### Phase 4: Consider Domain-Driven Design
 
-### For Teams:
-✅ **Easy Onboarding**: New developers understand it quickly  
-✅ **Parallel Work**: Different devs can work on M/V/C  
-✅ **Code Reviews**: Clear structure makes reviews easier  
-✅ **Standardized**: Industry-standard pattern  
+For large, complex applications with rich domain logic.
 
-## 📖 History & Context
+---
 
-### Origins of MVC
+## 🆚 MVC vs Other Patterns
 
-MVC was invented in 1979 by Trygve Reenskaug for Smalltalk at Xerox PARC. It was designed to separate concerns in graphical user interfaces.
+### MVC vs Layered Architecture
 
-### Evolution
+| Aspect             | MVC                   | Layered (N-Tier)                  |
+| ------------------ | --------------------- | --------------------------------- |
+| **Organization**   | Model-View-Controller | Presentation-Business-Data        |
+| **Focus**          | Presentation pattern  | Architectural pattern             |
+| **Layers**         | 3 (M-V-C)             | 4+ (API-Service-Repository-Model) |
+| **Business Logic** | In Controller         | In Service Layer                  |
+| **Complexity**     | Simple, flat          | More abstraction layers           |
+| **Best For**       | Simple CRUD apps      | Complex business logic            |
 
-- **1979**: Original MVC for desktop GUI applications
-- **1996**: Adapted for web applications (server-side rendering)
-- **2000s**: Ruby on Rails popularizes MVC for web
-- **2010s**: REST APIs adapt MVC (Views become JSON schemas)
-- **Today**: Still widely used, especially for CRUD applications
+### MVC vs Component Architecture
 
-### Modern Adaptations
+| Aspect           | MVC                        | Unidirectional Component       |
+| ---------------- | -------------------------- | ------------------------------ |
+| **Organization** | By concern (M/V/C)         | By feature (components)        |
+| **Files**        | Grouped by type            | Grouped by feature             |
+| **Coupling**     | Controller couples M & V   | Components independent         |
+| **Scalability**  | Horizontal (add more MVCs) | Vertical (add more components) |
+| **Best For**     | Traditional apps           | Large feature sets             |
 
-In REST APIs (like this project):
-- **Model** remains similar (data structure)
-- **View** becomes JSON schemas (Pydantic models)
-- **Controller** handles HTTP instead of GUI events
+---
+
+## 📚 Additional Resources
+
+### Database Migrations
+
+**Create a New Migration:**
+
+```bash
+alembic revision --autogenerate -m "description of changes"
+```
+
+**Apply Migrations:**
+
+```bash
+alembic upgrade head
+```
+
+**Rollback Migrations:**
+
+```bash
+alembic downgrade -1
+```
+
+### Extending the Application
+
+To add a new entity (e.g., Users):
+
+1. Create Model in `app/models/user.py`
+2. Create Views in `app/views/user_view.py`
+3. Create Controller in `app/controllers/user_controller.py`
+4. Register Controller in `main.py`
+
+---
 
 ## 🤝 Contributing
 
