@@ -1,0 +1,29 @@
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+graphql_demo.db
+
+# Environment & IDE
+.env
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Testing caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
